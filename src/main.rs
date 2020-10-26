@@ -13,7 +13,7 @@ fn doit() -> Result<()> {
     let state = clang::Clang::new()?;
     let index = clang::Index::new(&state, true, true);
 
-    let parser = index.parser("example_class.h");
+    let parser = index.parser("example_class.hpp");
 
     let translation_unit = parser.parse().unwrap();
 
