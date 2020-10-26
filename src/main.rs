@@ -63,7 +63,15 @@ fn handle_method(
     //let result = entity.get_result_type().unwrap().get_canonical_type();
     let result = entity.get_result_type().unwrap();
 
-    //print!("{}", result.get_display_name());
+    println!(
+        "Type is: {}",
+        result.get_canonical_type().get_display_name()
+    );
+    println!(
+        "Type is: {}",
+        result.get_pointee_type().unwrap().get_display_name()
+    );
+    //println!("Type is: {}", result.get_modified_type().unwrap().get_display_name());
 
     if let Some(result) = state
         .supported_types
