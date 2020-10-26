@@ -6,7 +6,7 @@ class Example
 public:
     Example(){}
 
-    const char * getName() const {
+    const        char * getName() const {
         return "an_example_class";
     }
 

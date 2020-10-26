@@ -7,6 +7,8 @@ use handlebars;
 use serde_json::json;
 use std::collections::HashMap;
 
+use std::io::Write;
+
 static CLASS_TEMPLATE: &'static str = "
 typedef struct
 {
@@ -30,6 +32,8 @@ struct State<'a> {
     renderer: handlebars::Handlebars<'a>,
     buffer: std::string::String,
     supported_types: SupportedTypes,
+    out_source: std::fs::File,
+    out_header: std::fs::File,
 }
 
 //------------------------------------------------------------------------------
@@ -38,7 +42,8 @@ fn handle_constructor(
     entity: clang::Entity,
     parent: clang::Entity,
 ) -> Result<()> {
-    println!(
+    writeln!(
+        &state.out_header,
         "{}",
         state
             .renderer
@@ -56,13 +61,18 @@ fn handle_constructor(
 
 //------------------------------------------------------------------------------
 fn decompose_type<'a, 'b>(
-    result : &'b mut std::vec::Vec<std::string::String>,
+    result: &'b mut std::vec::Vec<std::string::String>,
     type_: &'a clang::Type<'a>,
 ) {
     if let Some(type_) = type_.get_pointee_type() {
         result.push("*".to_string());
         decompose_type(result, &type_)
-    } else {
+    }
+    /*else if type_.is_const_qualified() {
+        result.push("const".t);
+        decompose_type(result, &type_)
+    }*/
+    else {
         result.push(type_.get_display_name())
     }
 }
@@ -73,17 +83,14 @@ fn handle_method(
     entity: clang::Entity,
     parent: clang::Entity,
 ) -> Result<()> {
-
     let mut result = std::vec::Vec::new();
     decompose_type(&mut result, &entity.get_result_type().unwrap());
 
     println!("{:?}", result);
 
-    if let Some(result) = state
-        .supported_types
-        .get(result.last().unwrap())
-    {
-        println!(
+    if let Some(result) = state.supported_types.get(result.last().unwrap()) {
+        writeln!(
+            &state.out_header,
             "{}",
             state
                 .renderer
@@ -109,7 +116,8 @@ fn handle_class(state: &mut State, entity: clang::Entity) -> Result<()> {
     let name = entity.get_display_name().unwrap();
 
     // Generate the code for the class
-    println!(
+    writeln!(
+        &state.out_header,
         "{}",
         state
             .renderer
@@ -168,6 +176,8 @@ fn doit() -> Result<()> {
         renderer: handlebars::Handlebars::new(),
         buffer: std::string::String::new(),
         supported_types: SupportedTypes::new(),
+        out_source: std::fs::File::create("out.cpp").unwrap(),
+        out_header: std::fs::File::create("out.hpp").unwrap(),
     };
     register_supported_types(&mut state.supported_types);
 
