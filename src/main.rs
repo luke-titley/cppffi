@@ -7,9 +7,14 @@ type Result<R> = std::result::Result<R, std::string::String>;
 fn handle_class(entity: clang::Entity) {
     let size = entity.get_type().unwrap().get_sizeof().unwrap();
     let align = entity.get_type().unwrap().get_alignof().unwrap();
-    println!("struct {} {{
+    println!(
+        "struct {} {{
     char m_impl[{}];
-}} __attribute__ ((aligned ({})));", entity.get_display_name().unwrap(), size, align)
+}} __attribute__ ((aligned ({})));",
+        entity.get_display_name().unwrap(),
+        size,
+        align
+    )
 }
 
 //------------------------------------------------------------------------------
@@ -22,16 +27,18 @@ fn doit() -> Result<()> {
     let translation_unit = parser.parse().unwrap();
 
     // Loop over the header file exporting everything that is of interest
-    translation_unit.get_entity().visit_children(|entity, parent| {
-        match entity.get_kind() {
-           // We want to output classes
-           clang::EntityKind::ClassDecl => handle_class(entity),
+    translation_unit
+        .get_entity()
+        .visit_children(|entity, parent| {
+            match entity.get_kind() {
+                // We want to output classes
+                clang::EntityKind::ClassDecl => handle_class(entity),
 
-           // Ignore everything else
-           _ => (),
-        }
-        clang::EntityVisitResult::Continue
-    });
+                // Ignore everything else
+                _ => (),
+            }
+            clang::EntityVisitResult::Continue
+        });
 
     Ok(())
 }
