@@ -19,7 +19,7 @@ static CONSTRUCTOR_TEMPLATE: &'static str = "
 ";
 
 static METHOD_TEMPLATE: &'static str = "
-{{return}} {{class}}_{{name}} ({{class}} * this{{arguments}});
+{{return}} {{class}}__{{name}} ({{class}} * this{{arguments}});
 ";
 
 //------------------------------------------------------------------------------
