@@ -5,7 +5,11 @@ type Result<R> = std::result::Result<R, std::string::String>;
 
 //------------------------------------------------------------------------------
 fn handle_class(entity: clang::Entity) {
-    println!("{}", entity.get_display_name().unwrap())
+    let size = entity.get_type().unwrap().get_sizeof().unwrap();
+    let align = entity.get_type().unwrap().get_alignof().unwrap();
+    println!("struct {} {{
+    char m_impl[{}];
+}} __attribute__ ((aligned ({})));", entity.get_display_name().unwrap(), size, align)
 }
 
 //------------------------------------------------------------------------------

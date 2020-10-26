@@ -9,4 +9,7 @@ public:
     const char * getName() const {
         return "an_example_class";
     }
+
+private:
+    double m_some_data;
 };
