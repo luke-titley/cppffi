@@ -24,7 +24,11 @@ struct State<'a> {
 }
 
 //------------------------------------------------------------------------------
-fn handle_method(state: &mut State, entity: clang::Entity, parent: clang::Entity) -> Result<()> {
+fn handle_method(
+    state: &mut State,
+    entity: clang::Entity,
+    parent: clang::Entity,
+) -> Result<()> {
     println!(
         "{}",
         state
