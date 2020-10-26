@@ -5,6 +5,7 @@ type Result<R> = std::result::Result<R, std::string::String>;
 
 use handlebars;
 use serde_json::json;
+use std::collections::HashMap;
 
 static CLASS_TEMPLATE: &'static str = "
 typedef struct
@@ -18,9 +19,13 @@ static METHOD_TEMPLATE: &'static str = "
 ";
 
 //------------------------------------------------------------------------------
+type SupportedTypes = HashMap<std::string::String, std::string::String>;
+
+//------------------------------------------------------------------------------
 struct State<'a> {
     renderer: handlebars::Handlebars<'a>,
     buffer: std::string::String,
+    supported_types: SupportedTypes,
 }
 
 //------------------------------------------------------------------------------
@@ -84,12 +89,23 @@ fn handle_class(state: &mut State, entity: clang::Entity) -> Result<()> {
 }
 
 //------------------------------------------------------------------------------
+fn register_supported_types(
+    supported_types: &mut SupportedTypes,
+) -> Result<()> {
+    supported_types.insert("int".to_string(), "int".to_string());
+
+    Ok(())
+}
+
+//------------------------------------------------------------------------------
 fn doit() -> Result<()> {
-    // Create the templates
+    // The state we'll pass around during codegen
     let mut state = State {
         renderer: handlebars::Handlebars::new(),
         buffer: std::string::String::new(),
+        supported_types: SupportedTypes::new(),
     };
+    register_supported_types(& mut state.supported_types);
 
     // Start parsing header files
     let clang = clang::Clang::new()?;
