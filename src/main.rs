@@ -34,13 +34,16 @@ fn handle_method(
     entity: clang::Entity,
     parent: clang::Entity,
 ) -> Result<()> {
+
+    let result = entity.get_result_type().unwrap();
+
     println!(
         "{}",
         state
             .renderer
             .render_template(
                 METHOD_TEMPLATE,
-                &json!({"return" : "void",
+                &json!({"return" : result.get_display_name(),
                         "name" : entity.get_display_name().unwrap(),
                         "class" : parent.get_display_name().unwrap(),
                         "arguments": "",
