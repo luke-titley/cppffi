@@ -55,27 +55,33 @@ fn handle_constructor(
 }
 
 //------------------------------------------------------------------------------
+fn decompose_type<'a, 'b>(
+    result : &'b mut std::vec::Vec<std::string::String>,
+    type_: &'a clang::Type<'a>,
+) {
+    if let Some(type_) = type_.get_pointee_type() {
+        result.push("*".to_string());
+        decompose_type(result, &type_)
+    } else {
+        result.push(type_.get_display_name())
+    }
+}
+
+//------------------------------------------------------------------------------
 fn handle_method(
     state: &mut State,
     entity: clang::Entity,
     parent: clang::Entity,
 ) -> Result<()> {
-    //let result = entity.get_result_type().unwrap().get_canonical_type();
-    let result = entity.get_result_type().unwrap();
 
-    println!(
-        "Type is: {}",
-        result.get_canonical_type().get_display_name()
-    );
-    println!(
-        "Type is: {}",
-        result.get_pointee_type().unwrap().get_display_name()
-    );
-    //println!("Type is: {}", result.get_modified_type().unwrap().get_display_name());
+    let mut result = std::vec::Vec::new();
+    decompose_type(&mut result, &entity.get_result_type().unwrap());
+
+    println!("{:?}", result);
 
     if let Some(result) = state
         .supported_types
-        .get(&result.get_display_name().to_string())
+        .get(result.last().unwrap())
     {
         println!(
             "{}",
