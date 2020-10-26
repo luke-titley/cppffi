@@ -92,6 +92,7 @@ fn handle_method(
 fn handle_class(state: &mut State, entity: clang::Entity) -> Result<()> {
     let size = entity.get_type().unwrap().get_sizeof().unwrap();
     let align = entity.get_type().unwrap().get_alignof().unwrap();
+    let name = entity.get_display_name().unwrap();
 
     // Generate the code for the class
     println!(
@@ -100,12 +101,18 @@ fn handle_class(state: &mut State, entity: clang::Entity) -> Result<()> {
             .renderer
             .render_template(
                 CLASS_TEMPLATE,
-                &json!({"name" : entity.get_display_name().unwrap(),
+                &json!({"name" : name,
                     "size" : size,
                     "align" : align})
             )
             .unwrap()
     );
+
+    // Add the class to the list of supported types subsequent methods
+    // will be able to refer to it
+    state
+        .supported_types
+        .insert(name.to_string(), name.to_string());
 
     // Generate the methods of the class
     entity.visit_children(|child, parent| {
