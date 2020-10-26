@@ -14,6 +14,10 @@ typedef struct
 } __attribute__((aligned({{align}}))) {{name}};
 ";
 
+static CONSTRUCTOR_TEMPLATE: &'static str = "
+{{class}}_{{class}} ({{class}} * this{{arguments}});
+";
+
 static METHOD_TEMPLATE: &'static str = "
 {{return}} {{class}}_{{name}} ({{class}} * this{{arguments}});
 ";
@@ -29,28 +33,57 @@ struct State<'a> {
 }
 
 //------------------------------------------------------------------------------
-fn handle_method(
+fn handle_constructor(
     state: &mut State,
     entity: clang::Entity,
     parent: clang::Entity,
 ) -> Result<()> {
-
-    let result = entity.get_result_type().unwrap();
-
     println!(
         "{}",
         state
             .renderer
             .render_template(
-                METHOD_TEMPLATE,
-                &json!({"return" : result.get_display_name(),
-                        "name" : entity.get_display_name().unwrap(),
-                        "class" : parent.get_display_name().unwrap(),
+                CONSTRUCTOR_TEMPLATE,
+                &json!({"class" : parent.get_display_name().unwrap(),
                         "arguments": "",
                 })
             )
             .unwrap()
     );
+
+    Ok(())
+}
+
+//------------------------------------------------------------------------------
+fn handle_method(
+    state: &mut State,
+    entity: clang::Entity,
+    parent: clang::Entity,
+) -> Result<()> {
+    //let result = entity.get_result_type().unwrap().get_canonical_type();
+    let result = entity.get_result_type().unwrap();
+
+    //print!("{}", result.get_display_name());
+
+    if let Some(result) = state
+        .supported_types
+        .get(&result.get_display_name().to_string())
+    {
+        println!(
+            "{}",
+            state
+                .renderer
+                .render_template(
+                    METHOD_TEMPLATE,
+                    &json!({"return" : result,
+                            "name" : entity.get_display_name().unwrap(),
+                            "class" : parent.get_display_name().unwrap(),
+                            "arguments": "",
+                    })
+                )
+                .unwrap()
+        );
+    }
 
     Ok(())
 }
@@ -77,7 +110,12 @@ fn handle_class(state: &mut State, entity: clang::Entity) -> Result<()> {
     // Generate the methods of the class
     entity.visit_children(|child, parent| {
         match child.get_kind() {
-            // We want to output classes
+            // Constructor
+            clang::EntityKind::Constructor => {
+                handle_constructor(state, child, entity);
+            }
+
+            // Methods
             clang::EntityKind::Method => {
                 handle_method(state, child, entity);
             }
@@ -95,7 +133,9 @@ fn handle_class(state: &mut State, entity: clang::Entity) -> Result<()> {
 fn register_supported_types(
     supported_types: &mut SupportedTypes,
 ) -> Result<()> {
-    supported_types.insert("int".to_string(), "int".to_string());
+    for i in ["int", "float", "double", "char"].iter() {
+        supported_types.insert(i.to_string(), i.to_string());
+    }
 
     Ok(())
 }
@@ -108,7 +148,7 @@ fn doit() -> Result<()> {
         buffer: std::string::String::new(),
         supported_types: SupportedTypes::new(),
     };
-    register_supported_types(& mut state.supported_types);
+    register_supported_types(&mut state.supported_types);
 
     // Start parsing header files
     let clang = clang::Clang::new()?;
