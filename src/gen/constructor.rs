@@ -21,7 +21,7 @@ static BODY_TEMPLATE: &'static str = "
 //------------------------------------------------------------------------------
 pub fn handle(
     state: &mut State,
-    entity: clang::Entity,
+    _: clang::Entity,
     parent: clang::Entity,
 ) -> Result<()> {
     // Header
