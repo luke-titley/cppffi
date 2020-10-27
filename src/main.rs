@@ -118,7 +118,10 @@ fn handle_method(
 
     println!("{:?}", result);
 
-    if let Some(result) = state.supported_types.get(result.last().unwrap()) {
+    if let Some(result_type) = state.supported_types.get(result.last().unwrap()) {
+        result.pop();
+        result.push(result_type.to_string());
+        let result_combined = result.join(" ");
         // Write out the header information
         writeln!(
             &state.out_header,
@@ -127,7 +130,7 @@ fn handle_method(
                 .renderer
                 .render_template(
                     METHOD_HEADER_TEMPLATE,
-                    &json!({"return" : result,
+                    &json!({"return" : result_combined,
                             "name" : entity.get_display_name().unwrap(),
                             "class" : parent.get_display_name().unwrap(),
                             "arguments": "",
@@ -144,7 +147,7 @@ fn handle_method(
                 .renderer
                 .render_template(
                     METHOD_BODY_TEMPLATE,
-                    &json!({"return" : result,
+                    &json!({"return" : result_combined,
                             "name" : entity.get_display_name().unwrap(),
                             "class" : parent.get_display_name().unwrap(),
                             "arguments": "",
