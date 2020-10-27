@@ -22,7 +22,6 @@ pub fn run(
 
     // Parse each header file we have been given
     for header in in_headers.iter() {
-
         // Parse the compiler arguments
         let mut parser = index.parser(header);
         parser.arguments(arguments);

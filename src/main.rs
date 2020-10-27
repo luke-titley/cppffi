@@ -11,5 +11,15 @@ mod utils;
 
 //------------------------------------------------------------------------------
 fn main() {
-    generator::run(&["example_class.hpp"], "out.hpp", "out.cpp", &["-I./"]);
+    generator::run(
+        &["imath_install/include/Imath/ImathVec.h"],
+        "out.hpp",
+        "out.cpp",
+        &[
+        "-x","c++",
+         "-isysroot/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+         "-isystem/Library/Developer/CommandLineTools/usr/include/c++/v1/",
+         "-isystem/Library/Developer/CommandLineTools/usr/lib/clang/10.0.1/include",
+          "-Iimath_install/include"],
+    );
 }
