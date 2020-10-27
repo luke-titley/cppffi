@@ -4,7 +4,6 @@
 use crate::result::Result;
 use crate::state::State;
 use serde_json::json;
-use std::io::Write;
 
 use crate::c_expose;
 use crate::utils;
@@ -27,7 +26,7 @@ pub fn handle(
     entity: clang::Entity,
     parent: clang::Entity,
 ) -> Result<()> {
-    if let Some(expose_arguments) =
+    if let Some(_) =
         c_expose::get_arguments(state, entity).unwrap()
     {
         let mut result = std::vec::Vec::new();

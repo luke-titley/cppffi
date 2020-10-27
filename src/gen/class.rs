@@ -6,7 +6,6 @@ use super::method;
 use crate::result::Result;
 use crate::state::State;
 use serde_json::json;
-use std::io::Write;
 
 //------------------------------------------------------------------------------
 static HEADER_TEMPLATE: &'static str = "
