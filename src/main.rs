@@ -98,10 +98,10 @@ fn decompose_type<'a, 'b>(
         result.push("*".to_string());
         decompose_type(result, &type_)
     }
-    /*else if type_.is_const_qualified() {
-        result.push("const".t);
-        decompose_type(result, &type_)
-    }*/
+    else if type_.is_const_qualified() {
+        result.push("const".to_string());
+        result.push(type_.get_display_name()[6..].to_string());
+    }
     else {
         result.push(type_.get_display_name())
     }
