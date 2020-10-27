@@ -11,5 +11,5 @@ mod utils;
 
 //------------------------------------------------------------------------------
 fn main() {
-    generator::run(&["example_class.hpp"], "out.hpp", "out.cpp");
+    generator::run(&["example_class.hpp"], "out.hpp", "out.cpp", &["-I./"]);
 }

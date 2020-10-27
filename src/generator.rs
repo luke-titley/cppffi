@@ -10,6 +10,7 @@ pub fn run(
     in_headers: &[&str],
     out_header: &str,
     out_source: &str,
+    arguments: &[&str],
 ) -> Result<()> {
     // The state we'll pass around during codegen
     let mut state = state::State::new(out_header, out_source)?;
@@ -21,10 +22,13 @@ pub fn run(
 
     // Parse each header file we have been given
     for header in in_headers.iter() {
-        let parser = index.parser(header);
-        let translation_unit = parser.parse().unwrap();
+
+        // Parse the compiler arguments
+        let mut parser = index.parser(header);
+        parser.arguments(arguments);
 
         // Loop over the header file exporting everything that is of interest
+        let translation_unit = parser.parse().unwrap();
         translation_unit
             .get_entity()
             .visit_children(|entity, parent| {
