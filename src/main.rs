@@ -16,12 +16,26 @@ typedef struct
 } __attribute__((aligned({{align}}))) {{name}};
 ";
 
-static CONSTRUCTOR_TEMPLATE: &'static str = "
+static CONSTRUCTOR_HEADER_TEMPLATE: &'static str = "
 {{class}}_{{class}} ({{class}} * this{{arguments}});
 ";
 
-static METHOD_TEMPLATE: &'static str = "
+static CONSTRUCTOR_BODY_TEMPLATE: &'static str = "
+{{class}}_{{class}} ({{class}} * this{{arguments}})
+{
+    new (this) {{class}}({{arguments}});
+}
+";
+
+static METHOD_HEADER_TEMPLATE: &'static str = "
 {{return}} {{class}}__{{name}} ({{class}} * this{{arguments}});
+";
+
+static METHOD_BODY_TEMPLATE: &'static str = "
+{{return}} {{class}}__{{name}} ({{class}} * this{{arguments}})
+{
+    return reinterpret_cast<{{class}}*>(this)->{{name}};
+}
 ";
 
 //------------------------------------------------------------------------------
@@ -42,13 +56,29 @@ fn handle_constructor(
     entity: clang::Entity,
     parent: clang::Entity,
 ) -> Result<()> {
+    // Header
     writeln!(
         &state.out_header,
         "{}",
         state
             .renderer
             .render_template(
-                CONSTRUCTOR_TEMPLATE,
+                CONSTRUCTOR_HEADER_TEMPLATE,
+                &json!({"class" : parent.get_display_name().unwrap(),
+                        "arguments": "",
+                })
+            )
+            .unwrap()
+    );
+
+    // Body
+    writeln!(
+        &state.out_source,
+        "{}",
+        state
+            .renderer
+            .render_template(
+                CONSTRUCTOR_BODY_TEMPLATE,
                 &json!({"class" : parent.get_display_name().unwrap(),
                         "arguments": "",
                 })
@@ -89,13 +119,31 @@ fn handle_method(
     println!("{:?}", result);
 
     if let Some(result) = state.supported_types.get(result.last().unwrap()) {
+        // Write out the header information
         writeln!(
             &state.out_header,
             "{}",
             state
                 .renderer
                 .render_template(
-                    METHOD_TEMPLATE,
+                    METHOD_HEADER_TEMPLATE,
+                    &json!({"return" : result,
+                            "name" : entity.get_display_name().unwrap(),
+                            "class" : parent.get_display_name().unwrap(),
+                            "arguments": "",
+                    })
+                )
+                .unwrap()
+        );
+
+        // Write out the body information
+        writeln!(
+            &state.out_source,
+            "{}",
+            state
+                .renderer
+                .render_template(
+                    METHOD_BODY_TEMPLATE,
                     &json!({"return" : result,
                             "name" : entity.get_display_name().unwrap(),
                             "class" : parent.get_display_name().unwrap(),
