@@ -23,18 +23,11 @@ pub fn handle(state: &mut State, entity: clang::Entity) -> Result<()> {
     let name = entity.get_display_name().unwrap();
 
     // Generate the code for the class
-    writeln!(
-        &state.out_header,
-        "{}",
-        state
-            .renderer
-            .render_template(
-                HEADER_TEMPLATE,
-                &json!({"name" : name,
-                    "size" : size,
-                    "align" : align})
-            )
-            .unwrap()
+    state.write_header(
+        HEADER_TEMPLATE,
+        &json!({"name" : name,
+                "size" : size,
+                "align" : align}),
     );
 
     // Add the class to the list of supported types subsequent methods

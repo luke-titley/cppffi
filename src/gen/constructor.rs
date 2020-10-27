@@ -25,33 +25,19 @@ pub fn handle(
     parent: clang::Entity,
 ) -> Result<()> {
     // Header
-    writeln!(
-        &state.out_header,
-        "{}",
-        state
-            .renderer
-            .render_template(
-                HEADER_TEMPLATE,
-                &json!({"class" : parent.get_display_name().unwrap(),
-                        "arguments": "",
-                })
-            )
-            .unwrap()
+    state.write_header(
+        HEADER_TEMPLATE,
+        &json!({"class" : parent.get_display_name().unwrap(),
+                "arguments": "",
+        }),
     );
 
     // Body
-    writeln!(
-        &state.out_source,
-        "{}",
-        state
-            .renderer
-            .render_template(
-                BODY_TEMPLATE,
-                &json!({"class" : parent.get_display_name().unwrap(),
-                        "arguments": "",
-                })
-            )
-            .unwrap()
+    state.write_source(
+        BODY_TEMPLATE,
+        &json!({"class" : parent.get_display_name().unwrap(),
+                "arguments": "",
+        }),
     );
 
     Ok(())

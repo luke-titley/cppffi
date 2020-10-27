@@ -23,4 +23,22 @@ impl<'a> State<'a> {
             out_header: std::fs::File::create(out_header).unwrap(),
         })
     }
+
+    pub fn write_header<T>(&self, template_string: &str, data: &T)
+    where
+        T: serde::ser::Serialize,
+    {
+        self.renderer
+            .render_template_to_write(template_string, data, &self.out_header)
+            .unwrap();
+    }
+
+    pub fn write_source<T>(&self, template_string: &str, data: &T)
+    where
+        T: serde::ser::Serialize,
+    {
+        self.renderer
+            .render_template_to_write(template_string, data, &self.out_source)
+            .unwrap();
+    }
 }

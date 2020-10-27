@@ -41,38 +41,25 @@ pub fn handle(
             result.pop();
             result.push(result_type.to_string());
             let result_combined = result.join(" ");
-            // Write out the header information
-            writeln!(
-                &state.out_header,
-                "{}",
-                state
-                    .renderer
-                    .render_template(
-                        HEADER_TEMPLATE,
-                        &json!({"return" : result_combined,
-                                "name" : entity.get_display_name().unwrap(),
-                                "class" : parent.get_display_name().unwrap(),
-                                "arguments": "",
-                        })
-                    )
-                    .unwrap()
+
+            // Header
+            state.write_header(
+                HEADER_TEMPLATE,
+                &json!({"return" : result_combined,
+                        "name" : entity.get_display_name().unwrap(),
+                        "class" : parent.get_display_name().unwrap(),
+                        "arguments": "",
+                }),
             );
 
-            // Write out the body information
-            writeln!(
-                &state.out_source,
-                "{}",
-                state
-                    .renderer
-                    .render_template(
-                        BODY_TEMPLATE,
-                        &json!({"return" : result_combined,
-                                "name" : entity.get_display_name().unwrap(),
-                                "class" : parent.get_display_name().unwrap(),
-                                "arguments": "",
-                        })
-                    )
-                    .unwrap()
+            // Source
+            state.write_source(
+                BODY_TEMPLATE,
+                &json!({"return" : result_combined,
+                        "name" : entity.get_display_name().unwrap(),
+                        "class" : parent.get_display_name().unwrap(),
+                        "arguments": "",
+                }),
             );
         }
     }
