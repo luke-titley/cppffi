@@ -97,14 +97,42 @@ fn decompose_type<'a, 'b>(
     if let Some(type_) = type_.get_pointee_type() {
         result.push("*".to_string());
         decompose_type(result, &type_)
-    }
-    else if type_.is_const_qualified() {
+    } else if type_.is_const_qualified() {
         result.push("const".to_string());
         result.push(type_.get_display_name()[6..].to_string());
-    }
-    else {
+    } else {
         result.push(type_.get_display_name())
     }
+}
+
+//------------------------------------------------------------------------------
+struct ExposeArguments {
+    pub arguments: std::string::String,
+}
+
+//------------------------------------------------------------------------------
+fn get_expose_arguments(
+    _: &mut State,
+    entity: clang::Entity,
+) -> Result<Option<ExposeArguments>> {
+    let mut result: Option<ExposeArguments> = None;
+
+    entity.visit_children(|child, _| {
+        match child.get_kind() {
+            clang::EntityKind::AnnotateAttr => {
+                result = Some(ExposeArguments {
+                    arguments: child.get_display_name().unwrap(),
+                });
+                return clang::EntityVisitResult::Break;
+            }
+
+            // Ignore everything else
+            _ => (),
+        };
+        clang::EntityVisitResult::Continue
+    });
+
+    Ok(result)
 }
 
 //------------------------------------------------------------------------------
@@ -113,48 +141,53 @@ fn handle_method(
     entity: clang::Entity,
     parent: clang::Entity,
 ) -> Result<()> {
-    let mut result = std::vec::Vec::new();
-    decompose_type(&mut result, &entity.get_result_type().unwrap());
+    if let Some(expose_arguments) = get_expose_arguments(state, entity).unwrap()
+    {
+        let mut result = std::vec::Vec::new();
+        decompose_type(&mut result, &entity.get_result_type().unwrap());
 
-    println!("{:?}", result);
+        println!("{:?}", result);
 
-    if let Some(result_type) = state.supported_types.get(result.last().unwrap()) {
-        result.pop();
-        result.push(result_type.to_string());
-        let result_combined = result.join(" ");
-        // Write out the header information
-        writeln!(
-            &state.out_header,
-            "{}",
-            state
-                .renderer
-                .render_template(
-                    METHOD_HEADER_TEMPLATE,
-                    &json!({"return" : result_combined,
-                            "name" : entity.get_display_name().unwrap(),
-                            "class" : parent.get_display_name().unwrap(),
-                            "arguments": "",
-                    })
-                )
-                .unwrap()
-        );
+        if let Some(result_type) =
+            state.supported_types.get(result.last().unwrap())
+        {
+            result.pop();
+            result.push(result_type.to_string());
+            let result_combined = result.join(" ");
+            // Write out the header information
+            writeln!(
+                &state.out_header,
+                "{}",
+                state
+                    .renderer
+                    .render_template(
+                        METHOD_HEADER_TEMPLATE,
+                        &json!({"return" : result_combined,
+                                "name" : entity.get_display_name().unwrap(),
+                                "class" : parent.get_display_name().unwrap(),
+                                "arguments": "",
+                        })
+                    )
+                    .unwrap()
+            );
 
-        // Write out the body information
-        writeln!(
-            &state.out_source,
-            "{}",
-            state
-                .renderer
-                .render_template(
-                    METHOD_BODY_TEMPLATE,
-                    &json!({"return" : result_combined,
-                            "name" : entity.get_display_name().unwrap(),
-                            "class" : parent.get_display_name().unwrap(),
-                            "arguments": "",
-                    })
-                )
-                .unwrap()
-        );
+            // Write out the body information
+            writeln!(
+                &state.out_source,
+                "{}",
+                state
+                    .renderer
+                    .render_template(
+                        METHOD_BODY_TEMPLATE,
+                        &json!({"return" : result_combined,
+                                "name" : entity.get_display_name().unwrap(),
+                                "class" : parent.get_display_name().unwrap(),
+                                "arguments": "",
+                        })
+                    )
+                    .unwrap()
+            );
+        }
     }
 
     Ok(())
