@@ -56,12 +56,11 @@ pub fn handle(state: &mut State, entity: clang::Entity) -> Result<()> {
                         ));
                     }
 
-                    /*
                     // Methods
                     clang::EntityKind::Method => {
                         to_visit_result(method::handle(state, child, entity));
                     }
-                    */
+
                     // Ignore everything else
                     _ => (),
                 };
