@@ -5,6 +5,7 @@ use super::gen;
 use super::result::Result;
 use super::state;
 use super::supported_types;
+use super::utils::to_visit_result;
 
 pub fn run(
     in_headers: &[&str],
@@ -14,7 +15,7 @@ pub fn run(
 ) -> Result<()> {
     // The state we'll pass around during codegen
     let mut state = state::State::new(out_header, out_source)?;
-    supported_types::register(&mut state.supported_types);
+    supported_types::register(&mut state.supported_types)?;
 
     // Start parsing header files
     let clang = clang::Clang::new()?;
@@ -28,27 +29,25 @@ pub fn run(
 
         // Loop over the header file exporting everything that is of interest
         let translation_unit = parser.parse().unwrap();
-        translation_unit
-            .get_entity()
-            .visit_children(|entity, parent| {
-                match entity.get_kind() {
-                    /*
-                    // Class
-                    clang::EntityKind::ClassDecl => {
-                        gen::class::handle(&mut state, entity);
-                    }
-                    */
-                    // Using
-                    clang::EntityKind::TypedefDecl => {
-                        //clang::EntityKind::UsingDeclaration => {
-                        gen::typedef::handle(&mut state, entity);
-                    }
+        translation_unit.get_entity().visit_children(|entity, _| {
+            match entity.get_kind() {
+                /*
+                // Class
+                clang::EntityKind::ClassDecl => {
+                    gen::class::handle(&mut state, entity);
+                }
+                */
+                // Using
+                clang::EntityKind::TypedefDecl => {
+                    //clang::EntityKind::UsingDeclaration => {
+                    to_visit_result(gen::typedef::handle(&mut state, entity));
+                }
 
-                    // Ignore everything else
-                    _ => (),
-                };
-                clang::EntityVisitResult::Recurse
-            });
+                // Ignore everything else
+                _ => (),
+            };
+            clang::EntityVisitResult::Recurse
+        });
     }
 
     Ok(())

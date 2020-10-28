@@ -1,5 +1,6 @@
 
 #define ffi_expose __attribute__((annotate("ffi_expose")))
+//#define ffi_expose [[annotate("ffi_expose")]]
 
 #include "Imath/ImathVec.h"
 

@@ -23,9 +23,7 @@ pub fn handle(state: &mut State, entity: clang::Entity) -> Result<()> {
         //println!("Weve found something");
         println!("{}", entity.get_display_name().unwrap());
 
-        let underlying_type =  entity
-        .get_typedef_underlying_type()
-        .unwrap();
+        let underlying_type = entity.get_typedef_underlying_type().unwrap();
 
         println!("{}", underlying_type.get_display_name());
         println!("{}", underlying_type.get_sizeof().unwrap());
