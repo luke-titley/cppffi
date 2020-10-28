@@ -1,11 +1,11 @@
 //------------------------------------------------------------------------------
 // Copywrite Luke Titley 2020
 //------------------------------------------------------------------------------
+use crate::ffi_expose;
 use crate::result::Result;
 use crate::state::State;
 use crate::utils::sanitize;
 use serde_json::json;
-use crate::ffi_expose;
 
 //------------------------------------------------------------------------------
 static HEADER_TEMPLATE: &'static str = "
@@ -15,9 +15,10 @@ static HEADER_TEMPLATE: &'static str = "
 static BODY_TEMPLATE: &'static str = "
 {{class}}_{{class}} ({{class}} * this{{arguments}})
 {
-    new (this) {{class}}({{arguments}});
+    {{body}}
 }
 ";
+
 
 //------------------------------------------------------------------------------
 pub fn handle(
@@ -26,7 +27,8 @@ pub fn handle(
     parent: clang::Entity,
 ) -> Result<()> {
     if let Some(_) = ffi_expose::get_arguments(state, entity)? {
-        let parent_name = sanitize(&parent.get_display_name().unwrap());
+        let cpp_parent_name = parent.get_display_name().unwrap();
+        let parent_name = sanitize(&cpp_parent_name);
         let name = sanitize(&entity.get_display_name().unwrap());
 
         // Header
@@ -38,10 +40,12 @@ pub fn handle(
         );
 
         // Body
+        let body = format!("new (this) {class}({arguments});", class=cpp_parent_name, arguments="");
         state.write_source(
             BODY_TEMPLATE,
-            &json!({"class" : parent_name,
-                    "arguments": "",
+            &json!({
+                    "class" : parent_name,
+                    "body" : body,
             }),
         );
     }
