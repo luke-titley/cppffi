@@ -12,7 +12,7 @@ mod utils;
 //------------------------------------------------------------------------------
 fn main() {
     generator::run(
-        &["imath_install/include/Imath/ImathVec.h"],
+        &["expose.h"],
         "out.hpp",
         "out.cpp",
         &[

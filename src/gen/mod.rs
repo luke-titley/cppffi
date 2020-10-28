@@ -4,3 +4,4 @@
 pub mod class;
 pub mod constructor;
 pub mod method;
+pub mod typedef;

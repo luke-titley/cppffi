@@ -32,15 +32,22 @@ pub fn run(
             .get_entity()
             .visit_children(|entity, parent| {
                 match entity.get_kind() {
-                    // We want to output classes
+                    /*
+                    // Class
                     clang::EntityKind::ClassDecl => {
                         gen::class::handle(&mut state, entity);
+                    }
+                    */
+                    // Using
+                    clang::EntityKind::TypedefDecl => {
+                        //clang::EntityKind::UsingDeclaration => {
+                        gen::typedef::handle(&mut state, entity);
                     }
 
                     // Ignore everything else
                     _ => (),
                 };
-                clang::EntityVisitResult::Continue
+                clang::EntityVisitResult::Recurse
             });
     }
 
