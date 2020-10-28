@@ -16,20 +16,22 @@ pub fn get_arguments(
 ) -> Result<Option<Arguments>> {
     let mut result: Option<Arguments> = None;
 
-    entity.visit_children(|child, _| {
-        match child.get_kind() {
-            clang::EntityKind::AnnotateAttr => {
-                result = Some(Arguments {
-                    arguments: child.get_display_name().unwrap(),
-                });
-                return clang::EntityVisitResult::Break;
-            }
+    if entity.has_attributes() {
+        entity.visit_children(|child, _| {
+            match child.get_kind() {
+                clang::EntityKind::AnnotateAttr => {
+                    result = Some(Arguments {
+                        arguments: child.get_display_name().unwrap(),
+                    });
+                    return clang::EntityVisitResult::Break;
+                }
 
-            // Ignore everything else
-            _ => (),
-        };
-        clang::EntityVisitResult::Continue
-    });
+                // Ignore everything else
+                _ => (),
+            };
+            clang::EntityVisitResult::Continue
+        });
+    }
 
     Ok(result)
 }

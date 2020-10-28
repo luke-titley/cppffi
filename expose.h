@@ -1,13 +1,18 @@
 
+#define xstr(s) str(s)
+#define str(s) #s
+
 #define ffi_expose __attribute__((annotate("ffi_expose")))
-//#define ffi_expose [[annotate("ffi_expose")]]
 
 #include "Imath/ImathVec.h"
 
-namespace Imath {
+namespace Imath_3_0 {
 
-typedef Imath::Vec2<float> Vec2f ffi_expose;
-//using Vec2f ffi_expose = Imath::Vec2<float> ffi_expose;
-//class ffi_expose Vec2f : public Imath::Vec2<float> {};
+// Instantiate templates
+//template class Imath::Vec2<float> ffi_expose;
+template class ffi_expose Imath::Vec2<float>;
+
+// Expose them with typedefs 
+//typedef Imath::Vec2<float> Vec2f ffi_expose;
 
 }

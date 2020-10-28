@@ -31,20 +31,26 @@ pub fn run(
         let translation_unit = parser.parse().unwrap();
         translation_unit.get_entity().visit_children(|entity, _| {
             match entity.get_kind() {
-                /*
                 // Class
                 clang::EntityKind::ClassDecl => {
-                    gen::class::handle(&mut state, entity);
+                    to_visit_result(gen::class::handle(&mut state, entity));
                 }
-                */
+
                 // Using
+                /*
                 clang::EntityKind::TypedefDecl => {
                     //clang::EntityKind::UsingDeclaration => {
                     to_visit_result(gen::typedef::handle(&mut state, entity));
                 }
-
+                */
                 // Ignore everything else
-                _ => (),
+                _ => {
+                    /*
+                    if let Some(name) = entity.get_display_name() {
+                        println!("name {} {:?}", name, kind);
+                    }
+                    */
+                }
             };
             clang::EntityVisitResult::Recurse
         });
