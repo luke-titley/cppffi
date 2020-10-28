@@ -3,6 +3,10 @@
 //------------------------------------------------------------------------------
 use super::result::Result;
 
+pub fn sanitize(name: &std::string::String) -> std::string::String {
+    name.replace("<", "_").replace(">", "_")
+}
+
 pub fn decompose_type<'a, 'b>(
     result: &'b mut std::vec::Vec<std::string::String>,
     type_: &'a clang::Type<'a>,

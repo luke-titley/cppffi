@@ -6,8 +6,8 @@ use super::method;
 use crate::ffi_expose;
 use crate::result::Result;
 use crate::state::State;
+use crate::utils::{sanitize, to_visit_result};
 use serde_json::json;
-use crate::utils::to_visit_result;
 
 //------------------------------------------------------------------------------
 static HEADER_TEMPLATE: &'static str = "
@@ -19,17 +19,13 @@ typedef struct
 
 //------------------------------------------------------------------------------
 pub fn handle(state: &mut State, entity: clang::Entity) -> Result<()> {
-
     if let Some(_) = ffi_expose::get_arguments(state, entity)? {
-        let name = entity.get_display_name().unwrap();
+        let name = sanitize(&entity.get_display_name().unwrap());
 
         let size = entity.get_type().unwrap().get_sizeof().unwrap();
         let align = entity.get_type().unwrap().get_alignof().unwrap();
 
         //println!("name {} {}", name, entity.has_attributes());
-
-        // If this is a template, replace the < and > with _
-        let name = name.replace("<","_").replace(">", "_");
 
         // Generate the code for the class
         state.write_header(
@@ -44,6 +40,34 @@ pub fn handle(state: &mut State, entity: clang::Entity) -> Result<()> {
         state
             .supported_types
             .insert(name.to_string(), name.to_string());
+
+        if let Some(definition) = entity.get_template() {
+            /*
+            println!("has definition {} {:?}", definition.get_display_name().unwrap(), definition.get_kind());
+            handle(state, definition)?;
+            */
+            // Generate the methods of the class
+            definition.visit_children(|child, _| {
+                match child.get_kind() {
+                    // Constructor
+                    clang::EntityKind::Constructor => {
+                        to_visit_result(constructor::handle(
+                            state, child, entity,
+                        ));
+                    }
+
+                    /*
+                    // Methods
+                    clang::EntityKind::Method => {
+                        to_visit_result(method::handle(state, child, entity));
+                    }
+                    */
+                    // Ignore everything else
+                    _ => (),
+                };
+                clang::EntityVisitResult::Continue
+            });
+        }
 
         // Generate the methods of the class
         entity.visit_children(|child, _| {
