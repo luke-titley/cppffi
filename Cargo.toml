@@ -14,3 +14,4 @@ clang = {version="1.0.2", features=["clang_10_0"]}
 handlebars = "3.5.1"
 serde_json = "1.0.59"
 serde = "1.0.117"
+regex = "1.4.1"

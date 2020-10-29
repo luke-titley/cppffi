@@ -26,12 +26,11 @@ pub fn handle(
     entity: clang::Entity,
     parent: clang::Entity,
 ) -> Result<()> {
-
     if let Some(_) = ffi_expose::get_arguments(state, entity).unwrap() {
         let mut result = std::vec::Vec::new();
         utils::decompose_type(&mut result, &entity.get_result_type().unwrap());
 
-        //println!("{:?}", result);
+        println!("{:?}", result);
 
         println!(
             "{} {}",

@@ -19,7 +19,6 @@ static BODY_TEMPLATE: &'static str = "
 }
 ";
 
-
 //------------------------------------------------------------------------------
 pub fn handle(
     state: &mut State,
@@ -40,7 +39,11 @@ pub fn handle(
         );
 
         // Body
-        let body = format!("new (this) {class}({arguments});", class=cpp_parent_name, arguments="");
+        let body = format!(
+            "new (this) {class}({arguments});",
+            class = cpp_parent_name,
+            arguments = ""
+        );
         state.write_source(
             BODY_TEMPLATE,
             &json!({

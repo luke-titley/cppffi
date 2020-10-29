@@ -6,7 +6,9 @@ use super::method;
 use crate::ffi_expose;
 use crate::result::Result;
 use crate::state::State;
-use crate::utils::{sanitize, to_visit_result};
+use crate::utils::{
+    build_template_parameter_mapping, sanitize, to_visit_result,
+};
 use serde_json::json;
 
 //------------------------------------------------------------------------------
@@ -42,11 +44,22 @@ pub fn handle(state: &mut State, entity: clang::Entity) -> Result<()> {
             .insert(name.to_string(), name.to_string());
 
         if let Some(definition) = entity.get_template() {
+            if let Some(arguments) = entity.get_template_arguments() {
+                println!("We have template arguments {:?}", arguments);
+            }
+
+            // Falling back to regex here. Not brilliant.
+            let template_params =
+                build_template_parameter_mapping(definition, entity);
+
+            println!("{:?}", template_params);
+
             /*
-            println!("has definition {} {:?}", definition.get_display_name().unwrap(), definition.get_kind());
-            handle(state, definition)?;
+            println!("{}", entity.get_display_name().unwrap());
+            println!("{}", definition.get_display_name().unwrap());
             */
-            // Generate the methods of the class
+
+            // Generate the methods of the class template definition
             definition.visit_children(|child, _| {
                 match child.get_kind() {
                     // Constructor
