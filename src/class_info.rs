@@ -42,10 +42,6 @@ pub fn build_template_parameter_mapping(
     template: clang::Entity,
     template_instance: clang::Entity,
 ) -> TemplateParameters {
-    // Entity name without the template parameters
-    let extract_class_name =
-        regex::Regex::new(r"^([a-zA-Z0-9]+)<*.*>*").unwrap();
-
     // The regex for getting the template parameters
     let extract_template_parameters =
         regex::Regex::new(r"[a-zA-Z0-9]+<([a-zA-Z0-9]+,?)*>").unwrap();
@@ -53,10 +49,6 @@ pub fn build_template_parameter_mapping(
     // Get the names
     let raw_def_name = template.get_display_name().unwrap();
     let raw_name = template_instance.get_display_name().unwrap();
-
-    // Match the class name
-    let class_name =
-        extract_class_name.captures(raw_def_name.as_str()).unwrap(); // THis should always pass
 
     // Match the template parameters
     let param_names =
@@ -66,7 +58,7 @@ pub fn build_template_parameter_mapping(
 
     // Zip the result
     let mut result = TemplateParameters::new();
-    result.insert(class_name[1].to_string(), raw_def_name.to_string());
+    result.insert(raw_def_name.to_string(), raw_name.to_string());
     for (key, value) in param_names.zip(param_values) {
         result.insert(key[1].to_string(), value[1].to_string());
     }

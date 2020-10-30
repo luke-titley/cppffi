@@ -11,15 +11,46 @@ use crate::utils;
 
 //------------------------------------------------------------------------------
 static HEADER_TEMPLATE: &'static str = "
-{{return}} {{class}}__{{{name}}} ({{class}} * this{{arguments}});
+{{return}} {{class}}__{{{name}}} ({{class}} * this {{comma}} {{arguments}});
 ";
 
 static BODY_TEMPLATE: &'static str = "
-{{return}} {{class}}__{{{name}}} ({{class}} * this{{arguments}})
+{{return}} {{class}}__{{{name}}} ({{class}} * this {{comma}} {{arguments}})
 {
     return reinterpret_cast<{{{class}}}*>(this)->{{{name}}};
 }
 ";
+
+//------------------------------------------------------------------------------
+pub fn convert_to_c_type<'a>(
+    info: &class_info::ClassInfo,
+    state: &mut State,
+    type_: &'a clang::Type<'a>,
+) -> Option<std::string::String> {
+    // Convert the type to vec of strings
+    let mut result = std::vec::Vec::new();
+    utils::decompose_type(&mut result, type_);
+
+    // Remap any template parameters
+    let mut remapped_result = std::vec::Vec::new();
+    for r in info.remap_template_parameters(&result[..]).iter() {
+        println!("remap {}", r.as_str());
+        match r.as_str() {
+            "*" | "&" | "const" => remapped_result.push(r.clone()),
+            r => {
+                if let Some(r_) = state.supported_types.get(r) {
+                    remapped_result.push(r_.clone());
+                } else {
+                    println!("{:?}", state.supported_types);
+                    println!("We're done");
+                    return None;
+                }
+            }
+        }
+    }
+
+    Some(remapped_result.join(" "))
+}
 
 //------------------------------------------------------------------------------
 pub fn handle(
@@ -29,42 +60,64 @@ pub fn handle(
     parent: clang::Entity,
 ) -> Result<()> {
     if let Some(_) = ffi_expose::get_arguments(state, entity).unwrap() {
-        let mut result = std::vec::Vec::new();
-        utils::decompose_type(&mut result, &entity.get_result_type().unwrap());
-
-        let mut result = info.remap_template_parameters(&result[..]);
-
         if let Some(result_type) =
-            state.supported_types.get(result.last().unwrap())
+            convert_to_c_type(info, state, &entity.get_result_type().unwrap())
         {
-            result.pop();
-            result.push(result_type.to_string());
-            let result_combined = result.join(" ");
-
             let class_name =
                 utils::sanitize(&parent.get_display_name().unwrap());
 
             let method_name = entity.get_name().unwrap();
 
-            // Header
-            state.write_header(
-                HEADER_TEMPLATE,
-                &json!({"return" : result_combined,
-                        "name" : method_name,
-                        "class" : class_name,
-                        "arguments": "",
-                }),
-            );
+            // Build the parameter list
+            if let Some(arguments) = entity.get_arguments() {
+                let params_vec = arguments
+                    .iter()
+                    .map(|arg| {
+                        let type_ = convert_to_c_type(
+                            info,
+                            state,
+                            &arg.get_type().unwrap(),
+                        )
+                        .expect(&format!(
+                            "Exposing a method that has parameter types that
+                              are not tagged to be exposed {}{}, see {}",
+                            class_name,
+                            method_name,
+                            arg.get_type().unwrap().get_display_name(),
+                        ));
+                        let name = arg.get_name().unwrap();
 
-            // Source
-            state.write_source(
-                BODY_TEMPLATE,
-                &json!({"return" : result_combined,
-                        "name" : method_name,
-                        "class" : class_name,
-                        "arguments": "",
-                }),
-            );
+                        format!("{} {}", type_, name)
+                    })
+                    .collect::<std::vec::Vec<std::string::String>>()
+                    .join(",");
+
+                let comma = if params_vec.is_empty() { "" } else { "," };
+
+                //let args = arguments.iter().map(|arg| {});
+
+                // Header
+                state.write_header(
+                    HEADER_TEMPLATE,
+                    &json!({"return" : result_type,
+                            "name" : method_name,
+                            "class" : class_name,
+                            "comma" : comma,
+                            "arguments": params_vec,
+                    }),
+                );
+
+                // Source
+                state.write_source(
+                    BODY_TEMPLATE,
+                    &json!({"return" : result_type,
+                            "name" : method_name,
+                            "class" : class_name,
+                            "comma" : comma,
+                            "arguments": params_vec,
+                    }),
+                );
+            }
         }
     }
 

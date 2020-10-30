@@ -38,9 +38,10 @@ pub fn handle(state: &mut State, entity: clang::Entity) -> Result<()> {
 
         // Add the class to the list of supported types subsequent methods
         // will be able to refer to it
-        state
-            .supported_types
-            .insert(name.to_string(), name.to_string());
+        state.supported_types.insert(
+            entity.get_display_name().unwrap().to_string(),
+            name.to_string(),
+        );
 
         if let Some(definition) = entity.get_template() {
             if let Some(arguments) = entity.get_template_arguments() {
