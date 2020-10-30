@@ -30,7 +30,6 @@ pub fn handle(
     if let Some(_) = ffi_expose::get_arguments(state, entity)? {
         let cpp_parent_name = parent.get_display_name().unwrap();
         let parent_name = sanitize(&cpp_parent_name);
-        let name = sanitize(&entity.get_display_name().unwrap());
 
         // Header
         state.write_header(

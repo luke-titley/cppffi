@@ -147,7 +147,7 @@ template <class T> class Vec2
     // Dot product
     //------------
 
-    IMATH_HOSTDEVICE constexpr T dot (const Vec2& v) const;
+    IMATH_HOSTDEVICE constexpr T dot (const Vec2& v) const ffi_expose;
     IMATH_HOSTDEVICE constexpr T operator^ (const Vec2& v) const;
 
     //------------------------------------------------

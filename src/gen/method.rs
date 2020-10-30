@@ -11,13 +11,13 @@ use crate::utils;
 
 //------------------------------------------------------------------------------
 static HEADER_TEMPLATE: &'static str = "
-{{return}} {{class}}__{{name}} ({{class}} * this{{arguments}});
+{{return}} {{class}}__{{{name}}} ({{class}} * this{{arguments}});
 ";
 
 static BODY_TEMPLATE: &'static str = "
-{{return}} {{class}}__{{name}} ({{class}} * this{{arguments}})
+{{return}} {{class}}__{{{name}}} ({{class}} * this{{arguments}})
 {
-    return reinterpret_cast<{{{class}}}*>(this)->{{name}};
+    return reinterpret_cast<{{{class}}}*>(this)->{{{name}}};
 }
 ";
 
@@ -34,14 +34,6 @@ pub fn handle(
 
         let mut result = info.remap_template_parameters(&result[..]);
 
-        println!("{:?}", result);
-
-        println!(
-            "{} {}",
-            entity.get_display_name().unwrap(),
-            entity.has_attributes()
-        );
-
         if let Some(result_type) =
             state.supported_types.get(result.last().unwrap())
         {
@@ -49,14 +41,19 @@ pub fn handle(
             result.push(result_type.to_string());
             let result_combined = result.join(" ");
 
-            let name = utils::sanitize(&parent.get_display_name().unwrap());
+            let class_name =
+                utils::sanitize(&parent.get_display_name().unwrap());
+
+            let method_name = entity.get_name().unwrap();
+
+            println!("Method name is {}", method_name);
 
             // Header
             state.write_header(
                 HEADER_TEMPLATE,
                 &json!({"return" : result_combined,
-                        "name" : entity.get_display_name().unwrap(),
-                        "class" : name,
+                        "name" : method_name,
+                        "class" : class_name,
                         "arguments": "",
                 }),
             );
@@ -65,8 +62,8 @@ pub fn handle(
             state.write_source(
                 BODY_TEMPLATE,
                 &json!({"return" : result_combined,
-                        "name" : entity.get_display_name().unwrap(),
-                        "class" : name,
+                        "name" : method_name,
+                        "class" : class_name,
                         "arguments": "",
                 }),
             );
