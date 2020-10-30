@@ -46,8 +46,6 @@ pub fn handle(
 
             let method_name = entity.get_name().unwrap();
 
-            println!("Method name is {}", method_name);
-
             // Header
             state.write_header(
                 HEADER_TEMPLATE,

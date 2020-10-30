@@ -44,7 +44,7 @@ pub fn handle(state: &mut State, entity: clang::Entity) -> Result<()> {
 
         if let Some(definition) = entity.get_template() {
             if let Some(arguments) = entity.get_template_arguments() {
-                println!("We have template arguments {:?}", arguments);
+                //println!("We have template arguments {:?}", arguments);
             }
 
             // Falling back to regex here. Not brilliant.
@@ -55,7 +55,7 @@ pub fn handle(state: &mut State, entity: clang::Entity) -> Result<()> {
                     ),
             };
 
-            println!("{:?}", &info.template_parameters);
+            //println!("{:?}", &info.template_parameters);
 
             /*
             println!("{}", entity.get_display_name().unwrap());

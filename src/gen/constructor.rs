@@ -10,11 +10,11 @@ use serde_json::json;
 
 //------------------------------------------------------------------------------
 static HEADER_TEMPLATE: &'static str = "
-{{class}}_{{class}} ({{class}} * this{{arguments}});
+void {{class}}_{{class}} ({{class}} * this{{arguments}});
 ";
 
 static BODY_TEMPLATE: &'static str = "
-{{class}}_{{class}} ({{class}} * this{{arguments}})
+void {{class}}_{{class}} ({{class}} * this{{arguments}})
 {
     new (this) {{{cpp_class}}}({{arguments}});
 }
