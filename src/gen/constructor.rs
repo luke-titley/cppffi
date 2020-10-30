@@ -1,6 +1,7 @@
 //------------------------------------------------------------------------------
 // Copywrite Luke Titley 2020
 //------------------------------------------------------------------------------
+use crate::class_info;
 use crate::ffi_expose;
 use crate::result::Result;
 use crate::state::State;
@@ -15,12 +16,13 @@ static HEADER_TEMPLATE: &'static str = "
 static BODY_TEMPLATE: &'static str = "
 {{class}}_{{class}} ({{class}} * this{{arguments}})
 {
-    {{body}}
+    new (this) {{{cpp_class}}}({{arguments}});
 }
 ";
 
 //------------------------------------------------------------------------------
 pub fn handle(
+    info: &class_info::ClassInfo,
     state: &mut State,
     entity: clang::Entity,
     parent: clang::Entity,
@@ -39,16 +41,12 @@ pub fn handle(
         );
 
         // Body
-        let body = format!(
-            "new (this) {class}({arguments});",
-            class = cpp_parent_name,
-            arguments = ""
-        );
         state.write_source(
             BODY_TEMPLATE,
             &json!({
                     "class" : parent_name,
-                    "body" : body,
+                    "cpp_class" : cpp_parent_name,
+                    "arguments" : "",
             }),
         );
     }

@@ -3,12 +3,11 @@
 //------------------------------------------------------------------------------
 use super::constructor;
 use super::method;
+use crate::class_info;
 use crate::ffi_expose;
 use crate::result::Result;
 use crate::state::State;
-use crate::utils::{
-    build_template_parameter_mapping, sanitize, to_visit_result,
-};
+use crate::utils::{sanitize, to_visit_result};
 use serde_json::json;
 
 //------------------------------------------------------------------------------
@@ -49,10 +48,14 @@ pub fn handle(state: &mut State, entity: clang::Entity) -> Result<()> {
             }
 
             // Falling back to regex here. Not brilliant.
-            let template_params =
-                build_template_parameter_mapping(definition, entity);
+            let info = class_info::ClassInfo {
+                template_parameters:
+                    class_info::build_template_parameter_mapping(
+                        definition, entity,
+                    ),
+            };
 
-            println!("{:?}", template_params);
+            println!("{:?}", &info.template_parameters);
 
             /*
             println!("{}", entity.get_display_name().unwrap());
@@ -65,13 +68,15 @@ pub fn handle(state: &mut State, entity: clang::Entity) -> Result<()> {
                     // Constructor
                     clang::EntityKind::Constructor => {
                         to_visit_result(constructor::handle(
-                            state, child, entity,
+                            &info, state, child, entity,
                         ));
                     }
 
                     // Methods
                     clang::EntityKind::Method => {
-                        to_visit_result(method::handle(state, child, entity));
+                        to_visit_result(method::handle(
+                            &info, state, child, entity,
+                        ));
                     }
 
                     // Ignore everything else
@@ -83,15 +88,21 @@ pub fn handle(state: &mut State, entity: clang::Entity) -> Result<()> {
 
         // Generate the methods of the class
         entity.visit_children(|child, _| {
+            let info = class_info::ClassInfo::default();
+
             match child.get_kind() {
                 // Constructor
                 clang::EntityKind::Constructor => {
-                    to_visit_result(constructor::handle(state, child, entity));
+                    to_visit_result(constructor::handle(
+                        &info, state, child, entity,
+                    ));
                 }
 
                 // Methods
                 clang::EntityKind::Method => {
-                    to_visit_result(method::handle(state, child, entity));
+                    to_visit_result(method::handle(
+                        &info, state, child, entity,
+                    ));
                 }
 
                 // Ignore everything else

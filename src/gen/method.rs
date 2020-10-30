@@ -5,6 +5,7 @@ use crate::result::Result;
 use crate::state::State;
 use serde_json::json;
 
+use crate::class_info;
 use crate::ffi_expose;
 use crate::utils;
 
@@ -16,12 +17,13 @@ static HEADER_TEMPLATE: &'static str = "
 static BODY_TEMPLATE: &'static str = "
 {{return}} {{class}}__{{name}} ({{class}} * this{{arguments}})
 {
-    return reinterpret_cast<{{class}}*>(this)->{{name}};
+    return reinterpret_cast<{{{class}}}*>(this)->{{name}};
 }
 ";
 
 //------------------------------------------------------------------------------
 pub fn handle(
+    info: &class_info::ClassInfo,
     state: &mut State,
     entity: clang::Entity,
     parent: clang::Entity,
@@ -29,6 +31,8 @@ pub fn handle(
     if let Some(_) = ffi_expose::get_arguments(state, entity).unwrap() {
         let mut result = std::vec::Vec::new();
         utils::decompose_type(&mut result, &entity.get_result_type().unwrap());
+
+        let mut result = info.remap_template_parameters(&result[..]);
 
         println!("{:?}", result);
 
@@ -45,12 +49,14 @@ pub fn handle(
             result.push(result_type.to_string());
             let result_combined = result.join(" ");
 
+            let name = utils::sanitize(&parent.get_display_name().unwrap());
+
             // Header
             state.write_header(
                 HEADER_TEMPLATE,
                 &json!({"return" : result_combined,
                         "name" : entity.get_display_name().unwrap(),
-                        "class" : parent.get_display_name().unwrap(),
+                        "class" : name,
                         "arguments": "",
                 }),
             );
@@ -60,7 +66,7 @@ pub fn handle(
                 BODY_TEMPLATE,
                 &json!({"return" : result_combined,
                         "name" : entity.get_display_name().unwrap(),
-                        "class" : parent.get_display_name().unwrap(),
+                        "class" : name,
                         "arguments": "",
                 }),
             );
