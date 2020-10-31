@@ -155,7 +155,7 @@ template <class T> class Vec2
     // Vec3 (this->x, this->y, 0) % Vec3 (v.x, v.y, 0)
     //------------------------------------------------
 
-    IMATH_HOSTDEVICE constexpr T cross (const Vec2& v) const;
+    IMATH_HOSTDEVICE constexpr T cross (const Vec2& v) const ffi_auto;
     IMATH_HOSTDEVICE constexpr T operator% (const Vec2& v) const;
 
     //------------------------

@@ -18,7 +18,11 @@ static HEADER_TEMPLATE: &'static str = "
 static BODY_TEMPLATE: &'static str = "
 {{return}} {{class}}__{{{outer_name}}} ({{class}} * this {{comma}} {{params}})
 { {{{types}}}
-    return reinterpret_cast<{{{class}}}*>(this)->{{{name}}}({{{args}}});
+    {{#if is_void}}
+    return ({{{class}}}*)(this)->{{{name}}}({{{args}}});
+    {{else}}
+    return ({{return}})(({{{class}}}*)(this)->{{{name}}}({{{args}}}));
+    {{/if}}
 }
 ";
 
@@ -73,9 +77,11 @@ pub fn handle(
                 );
 
                 // Source
+                let is_void = result_type == "void";
                 state.write_source(
                     BODY_TEMPLATE,
                     &json!({"return" : result_type,
+                            "is_void" : is_void,
                             "name" : method_name,
                             "outer_name" : outer_method_name,
                             "class" : class_name,
