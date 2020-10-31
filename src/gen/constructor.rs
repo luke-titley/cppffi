@@ -30,7 +30,7 @@ pub fn handle(
 ) -> Result<()> {
     if let Some(ffi_arguments) = ffi_expose::get_arguments(state, entity)? {
         let cpp_parent_name = parent.get_display_name().unwrap();
-        let parent_name = sanitize(&cpp_parent_name);
+        let parent_name = info.c_name.clone();
 
         let outer_method_name = if ffi_arguments.arguments.is_empty()
             || ffi_arguments.arguments[0].is_empty()

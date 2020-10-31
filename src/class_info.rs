@@ -7,13 +7,14 @@ type TemplateParameters =
 //------------------------------------------------------------------------------
 pub struct ClassInfo {
     pub template_parameters: TemplateParameters,
+    pub c_name: std::string::String,
 }
 
-//------------------------------------------------------------------------------
-impl Default for ClassInfo {
-    fn default() -> Self {
+impl ClassInfo {
+    pub fn new(name : &str) -> Self {
         Self {
             template_parameters: TemplateParameters::new(),
+            c_name : name.to_string(),
         }
     }
 }

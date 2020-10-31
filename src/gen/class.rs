@@ -20,8 +20,14 @@ typedef struct
 
 //------------------------------------------------------------------------------
 pub fn handle(state: &mut State, entity: clang::Entity) -> Result<()> {
-    if let Some(_) = ffi_expose::get_arguments(state, entity)? {
-        let name = sanitize(&entity.get_display_name().unwrap());
+    if let Some(ffi_arguments) = ffi_expose::get_arguments(state, entity)? {
+        let original_name = entity.get_display_name().unwrap();
+
+        let name = sanitize(if ffi_arguments.arguments.is_empty() {
+            &original_name
+        } else {
+            &ffi_arguments.arguments[0]
+        });
 
         let size = entity.get_type().unwrap().get_sizeof().unwrap();
         let align = entity.get_type().unwrap().get_alignof().unwrap();
@@ -44,7 +50,7 @@ pub fn handle(state: &mut State, entity: clang::Entity) -> Result<()> {
         );
 
         if let Some(definition) = entity.get_template() {
-            if let Some(arguments) = entity.get_template_arguments() {
+            if let Some(_) = entity.get_template_arguments() {
                 //println!("We have template arguments {:?}", arguments);
             }
 
@@ -54,6 +60,7 @@ pub fn handle(state: &mut State, entity: clang::Entity) -> Result<()> {
                     class_info::build_template_parameter_mapping(
                         definition, entity,
                     ),
+                    c_name : name.clone(),
             };
 
             //println!("{:?}", &info.template_parameters);
@@ -89,7 +96,7 @@ pub fn handle(state: &mut State, entity: clang::Entity) -> Result<()> {
 
         // Generate the methods of the class
         entity.visit_children(|child, _| {
-            let info = class_info::ClassInfo::default();
+            let info = class_info::ClassInfo::new(&name);
 
             match child.get_kind() {
                 // Constructor

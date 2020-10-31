@@ -21,7 +21,7 @@ static BODY_TEMPLATE: &'static str = "
     {{#if is_void}}
     return ({{{class}}}*)(this)->{{{name}}}({{{args}}});
     {{else}}
-    {{return}} ffi_result = (({{{class}}}*)this)->{{{name}}}({{{args}}}));
+    {{return}} ffi_result = (({{{cpp_class}}}*)this)->{{{name}}}({{{args}}}));
     return *((({{return}})*)&ffi_result);
     {{/if}}
 }
@@ -40,8 +40,8 @@ pub fn handle(
         if let Some(result_type) =
             convert_to_c_type(info, state, &entity.get_result_type().unwrap())
         {
-            let class_name =
-                utils::sanitize(&parent.get_display_name().unwrap());
+            let cpp_class_name = parent.get_display_name().unwrap();
+            let class_name = info.c_name.clone();
 
             let method_name = entity.get_name().unwrap();
             let outer_method_name = if ffi_arguments.arguments.is_empty()
@@ -86,6 +86,7 @@ pub fn handle(
                             "name" : method_name,
                             "outer_name" : outer_method_name,
                             "class" : class_name,
+                            "cpp_class" : cpp_class_name,
                             "types" : types,
                             "comma" : comma,
                             "params": params,
