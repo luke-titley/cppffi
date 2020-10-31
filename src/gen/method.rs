@@ -11,15 +11,28 @@ use crate::utils;
 
 //------------------------------------------------------------------------------
 static HEADER_TEMPLATE: &'static str = "
-{{return}} {{class}}__{{{name}}} ({{class}} * this {{comma}} {{arguments}});
+{{return}} {{class}}__{{{name}}} ({{class}} * this {{comma}} {{params}});
 ";
 
 static BODY_TEMPLATE: &'static str = "
-{{return}} {{class}}__{{{name}}} ({{class}} * this {{comma}} {{arguments}})
+{{return}} {{class}}__{{{name}}} ({{class}} * this {{comma}} {{params}})
 {
-    return reinterpret_cast<{{{class}}}*>(this)->{{{name}}};
+    return reinterpret_cast<{{{class}}}*>(this)->{{{name}}}({{{args}}});
 }
 ";
+
+//------------------------------------------------------------------------------
+pub fn expand_template_parameters<'a>(
+    info: &class_info::ClassInfo,
+    type_: &'a clang::Type<'a>,
+) -> std::string::String {
+    // Convert the type to vec of strings
+    let mut result = std::vec::Vec::new();
+    utils::decompose_type(&mut result, type_);
+
+    // Remap any template parameters
+    info.remap_template_parameters(&result[..]).join(" ")
+}
 
 //------------------------------------------------------------------------------
 pub fn convert_to_c_type<'a>(
@@ -34,7 +47,6 @@ pub fn convert_to_c_type<'a>(
     // Remap any template parameters
     let mut remapped_result = std::vec::Vec::new();
     for r in info.remap_template_parameters(&result[..]).iter() {
-        println!("remap {}", r.as_str());
         match r.as_str() {
             "*" | "&" | "const" => remapped_result.push(r.clone()),
             r => {
@@ -70,6 +82,7 @@ pub fn handle(
 
             // Build the parameter list
             if let Some(arguments) = entity.get_arguments() {
+                // Params
                 let params_vec = arguments
                     .iter()
                     .map(|arg| {
@@ -92,6 +105,21 @@ pub fn handle(
                     .collect::<std::vec::Vec<std::string::String>>()
                     .join(",");
 
+                // Arguments
+                let args_vec = arguments
+                    .iter()
+                    .map(|arg| {
+                        let type_ = expand_template_parameters(
+                            info,
+                            &arg.get_type().unwrap(),
+                        );
+                        let name = arg.get_name().unwrap();
+
+                        format!("*((({}*))&{})", type_, name)
+                    })
+                    .collect::<std::vec::Vec<std::string::String>>()
+                    .join(",");
+
                 let comma = if params_vec.is_empty() { "" } else { "," };
 
                 //let args = arguments.iter().map(|arg| {});
@@ -103,7 +131,8 @@ pub fn handle(
                             "name" : method_name,
                             "class" : class_name,
                             "comma" : comma,
-                            "arguments": params_vec,
+                            "params": params_vec,
+                            "args": args_vec,
                     }),
                 );
 
@@ -114,7 +143,8 @@ pub fn handle(
                             "name" : method_name,
                             "class" : class_name,
                             "comma" : comma,
-                            "arguments": params_vec,
+                            "params": params_vec,
+                            "args" : args_vec,
                     }),
                 );
             }
