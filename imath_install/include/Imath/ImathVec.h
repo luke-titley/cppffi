@@ -111,7 +111,7 @@ template <class T> class Vec2
 
     template <class S> IMATH_HOSTDEVICE void getValue (Vec2<S>& v) const;
 
-    IMATH_HOSTDEVICE T* getValue() ffi_auto;
+    IMATH_HOSTDEVICE T* getValue() ffi(mut_value);
     IMATH_HOSTDEVICE const T* getValue() const;
 
     //---------

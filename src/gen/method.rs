@@ -21,7 +21,8 @@ static BODY_TEMPLATE: &'static str = "
     {{#if is_void}}
     return ({{{class}}}*)(this)->{{{name}}}({{{args}}});
     {{else}}
-    return ({{return}})(({{{class}}}*)(this)->{{{name}}}({{{args}}}));
+    {{return}} ffi_result = (({{{class}}}*)this)->{{{name}}}({{{args}}}));
+    return *((({{return}})*)&ffi_result);
     {{/if}}
 }
 ";
