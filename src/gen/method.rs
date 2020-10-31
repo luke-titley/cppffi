@@ -5,10 +5,10 @@ use crate::result::Result;
 use crate::state::State;
 use serde_json::json;
 
+use crate::arguments::{build_arguments, convert_to_c_type};
 use crate::class_info;
 use crate::ffi_expose;
 use crate::utils;
-use crate::arguments::{build_arguments, convert_to_c_type};
 
 //------------------------------------------------------------------------------
 static HEADER_TEMPLATE: &'static str = "
@@ -17,7 +17,7 @@ static HEADER_TEMPLATE: &'static str = "
 
 static BODY_TEMPLATE: &'static str = "
 {{return}} {{class}}__{{{outer_name}}} ({{class}} * this {{comma}} {{params}})
-{
+{ {{{types}}}
     return reinterpret_cast<{{{class}}}*>(this)->{{{name}}}({{{args}}});
 }
 ";
@@ -51,7 +51,7 @@ pub fn handle(
             if let Some(arguments) = entity.get_arguments() {
                 //let args = arguments.iter().map(|arg| {});
 
-                let (params, args, comma) = build_arguments(
+                let (types, params, args, comma) = build_arguments(
                     info,
                     state,
                     &class_name,
@@ -79,6 +79,7 @@ pub fn handle(
                             "name" : method_name,
                             "outer_name" : outer_method_name,
                             "class" : class_name,
+                            "types" : types,
                             "comma" : comma,
                             "params": params,
                             "args" : args,

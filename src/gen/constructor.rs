@@ -1,13 +1,13 @@
 //------------------------------------------------------------------------------
 // Copywrite Luke Titley 2020
 //------------------------------------------------------------------------------
+use crate::arguments::build_arguments;
 use crate::class_info;
 use crate::ffi_expose;
 use crate::result::Result;
 use crate::state::State;
 use crate::utils::sanitize;
 use serde_json::json;
-use crate::arguments::{build_arguments};
 
 //------------------------------------------------------------------------------
 static HEADER_TEMPLATE: &'static str = "
@@ -16,7 +16,7 @@ void {{class}}_{{outer_method}} ({{class}} * this{{comma}} {{params}});
 
 static BODY_TEMPLATE: &'static str = "
 void {{class}}_{{outer_method}} ({{class}} * this{{comma}} {{params}})
-{
+{ {{{types}}}
     new (this) {{{cpp_class}}}({{{args}}});
 }
 ";
@@ -44,7 +44,7 @@ pub fn handle(
         if let Some(arguments) = entity.get_arguments() {
             //let args = arguments.iter().map(|arg| {});
 
-            let (params, args, comma) = build_arguments(
+            let (types, params, args, comma) = build_arguments(
                 info,
                 state,
                 &parent_name,
@@ -73,6 +73,7 @@ pub fn handle(
                         "args": args,
                         "params": params,
                         "comma": comma,
+                        "types" : types,
                 }),
             );
         }

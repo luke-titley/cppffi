@@ -55,7 +55,31 @@ pub fn build_arguments(
     class_name: &std::string::String,
     method_name: &std::string::String,
     arguments: std::vec::Vec<clang::Entity>,
-) -> (std::string::String, std::string::String, &'static str) {
+) -> (
+    std::string::String,
+    std::string::String,
+    std::string::String,
+    &'static str,
+) {
+    // Param types
+    let types = arguments
+        .iter()
+        .enumerate()
+        .map(|(index, arg)| {
+            let type_ =
+                convert_to_c_type(info, state, &arg.get_type().unwrap())
+                    .expect(&format!(
+                        "Exposing a method that has parameter types that
+          are not tagged to be exposed {}{}, see {}",
+                        class_name,
+                        method_name,
+                        arg.get_type().unwrap().get_display_name(),
+                    ));
+            format!("\n    using ARG_{} = {};", index, type_)
+        })
+        .collect::<std::vec::Vec<std::string::String>>()
+        .join("");
+
     // Params
     let params = arguments
         .iter()
@@ -79,17 +103,16 @@ pub fn build_arguments(
     // Arguments
     let args = arguments
         .iter()
-        .map(|arg| {
-            let type_ =
-                expand_template_parameters(info, &arg.get_type().unwrap());
+        .enumerate()
+        .map(|(index, arg)| {
             let name = arg.get_name().unwrap();
 
-            format!("*((({}*))&{})", type_, name)
+            format!("*((ARG_{index}*)&{name})", index = index, name = name)
         })
         .collect::<std::vec::Vec<std::string::String>>()
         .join(",");
 
     let comma = if params.is_empty() { "" } else { "," };
 
-    (params, args, comma)
+    (types, params, args, comma)
 }
