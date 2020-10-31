@@ -81,7 +81,9 @@ pub fn handle(
                 utils::sanitize(&parent.get_display_name().unwrap());
 
             let method_name = entity.get_name().unwrap();
-            let outer_method_name = if ffi_arguments.arguments.is_empty() {
+            let outer_method_name = if ffi_arguments.arguments.is_empty()
+                || ffi_arguments.arguments[0].is_empty()
+            {
                 method_name.clone()
             } else {
                 ffi_arguments.arguments[0].clone()
