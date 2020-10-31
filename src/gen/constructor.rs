@@ -32,12 +32,12 @@ pub fn handle(
         let parent_name = sanitize(&cpp_parent_name);
 
         let outer_method_name = if ffi_arguments.arguments.is_empty()
-                || ffi_arguments.arguments[0].is_empty()
-            {
-                "new".to_string()
-            } else {
-                ffi_arguments.arguments[0].clone()
-            };
+            || ffi_arguments.arguments[0].is_empty()
+        {
+            "new".to_string()
+        } else {
+            ffi_arguments.arguments[0].clone()
+        };
 
         // Header
         state.write_header(
