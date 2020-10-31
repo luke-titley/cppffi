@@ -11,11 +11,11 @@ use crate::utils;
 
 //------------------------------------------------------------------------------
 static HEADER_TEMPLATE: &'static str = "
-{{return}} {{class}}__{{{name}}} ({{class}} * this {{comma}} {{params}});
+{{return}} {{class}}__{{{outer_name}}} ({{class}} * this {{comma}} {{params}});
 ";
 
 static BODY_TEMPLATE: &'static str = "
-{{return}} {{class}}__{{{name}}} ({{class}} * this {{comma}} {{params}})
+{{return}} {{class}}__{{{outer_name}}} ({{class}} * this {{comma}} {{params}})
 {
     return reinterpret_cast<{{{class}}}*>(this)->{{{name}}}({{{args}}});
 }
@@ -71,7 +71,9 @@ pub fn handle(
     entity: clang::Entity,
     parent: clang::Entity,
 ) -> Result<()> {
-    if let Some(_) = ffi_expose::get_arguments(state, entity).unwrap() {
+    if let Some(ffi_arguments) =
+        ffi_expose::get_arguments(state, entity).unwrap()
+    {
         if let Some(result_type) =
             convert_to_c_type(info, state, &entity.get_result_type().unwrap())
         {
@@ -79,6 +81,11 @@ pub fn handle(
                 utils::sanitize(&parent.get_display_name().unwrap());
 
             let method_name = entity.get_name().unwrap();
+            let outer_method_name = if ffi_arguments.arguments.is_empty() {
+                method_name.clone()
+            } else {
+                ffi_arguments.arguments[0].clone()
+            };
 
             // Build the parameter list
             if let Some(arguments) = entity.get_arguments() {
@@ -129,6 +136,7 @@ pub fn handle(
                     HEADER_TEMPLATE,
                     &json!({"return" : result_type,
                             "name" : method_name,
+                            "outer_name" : outer_method_name,
                             "class" : class_name,
                             "comma" : comma,
                             "params": params_vec,
@@ -141,6 +149,7 @@ pub fn handle(
                     BODY_TEMPLATE,
                     &json!({"return" : result_type,
                             "name" : method_name,
+                            "outer_name" : outer_method_name,
                             "class" : class_name,
                             "comma" : comma,
                             "params": params_vec,

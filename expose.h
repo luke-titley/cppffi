@@ -3,6 +3,7 @@
 #define str(s) #s
 
 #define ffi_expose __attribute__((annotate("ffi_expose")))
+#define ffi_expose_named(S) __attribute__((annotate("ffi_expose" #S)))
 
 #include "Imath/ImathVec.h"
 

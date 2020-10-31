@@ -6,7 +6,7 @@ use super::state::State;
 
 //------------------------------------------------------------------------------
 pub struct Arguments {
-    pub arguments: std::string::String,
+    pub arguments: std::vec::Vec<std::string::String>,
 }
 
 //------------------------------------------------------------------------------
@@ -20,10 +20,18 @@ pub fn get_arguments(
         entity.visit_children(|child, _| {
             match child.get_kind() {
                 clang::EntityKind::AnnotateAttr => {
-                    result = Some(Arguments {
-                        arguments: child.get_display_name().unwrap(),
-                    });
-                    return clang::EntityVisitResult::Break;
+                    let name = child.get_display_name().unwrap();
+
+                    if name.starts_with("ffi_expose") {
+                        let arguments: std::vec::Vec<std::string::String> =
+                            name[10..]
+                                .split(" ")
+                                .map(|i| i.to_string())
+                                .collect();
+
+                        result = Some(Arguments { arguments });
+                        return clang::EntityVisitResult::Break;
+                    }
                 }
 
                 // Ignore everything else
