@@ -7,16 +7,17 @@ use crate::result::Result;
 use crate::state::State;
 use crate::utils::sanitize;
 use serde_json::json;
+use crate::arguments::{build_arguments};
 
 //------------------------------------------------------------------------------
 static HEADER_TEMPLATE: &'static str = "
-void {{class}}_{{outer_method}} ({{class}} * this{{arguments}});
+void {{class}}_{{outer_method}} ({{class}} * this{{comma}} {{params}});
 ";
 
 static BODY_TEMPLATE: &'static str = "
-void {{class}}_{{outer_method}} ({{class}} * this{{arguments}})
+void {{class}}_{{outer_method}} ({{class}} * this{{comma}} {{params}})
 {
-    new (this) {{{cpp_class}}}({{arguments}});
+    new (this) {{{cpp_class}}}({{{args}}});
 }
 ";
 
@@ -39,25 +40,42 @@ pub fn handle(
             ffi_arguments.arguments[0].clone()
         };
 
-        // Header
-        state.write_header(
-            HEADER_TEMPLATE,
-            &json!({"class" : parent_name,
-                    "outer_method" : outer_method_name,
-                    "arguments": "",
-            }),
-        );
+        // Build the parameter list
+        if let Some(arguments) = entity.get_arguments() {
+            //let args = arguments.iter().map(|arg| {});
 
-        // Body
-        state.write_source(
-            BODY_TEMPLATE,
-            &json!({
-                    "class" : parent_name,
-                    "cpp_class" : cpp_parent_name,
-                    "outer_method" : outer_method_name,
-                    "arguments" : "",
-            }),
-        );
+            let (params, args, comma) = build_arguments(
+                info,
+                state,
+                &parent_name,
+                &outer_method_name,
+                arguments,
+            );
+
+            // Header
+            state.write_header(
+                HEADER_TEMPLATE,
+                &json!({"class" : parent_name,
+                        "outer_method" : outer_method_name,
+                        "args": args,
+                        "params": params,
+                        "comma": comma,
+                }),
+            );
+
+            // Body
+            state.write_source(
+                BODY_TEMPLATE,
+                &json!({
+                        "class" : parent_name,
+                        "cpp_class" : cpp_parent_name,
+                        "outer_method" : outer_method_name,
+                        "args": args,
+                        "params": params,
+                        "comma": comma,
+                }),
+            );
+        }
     }
 
     Ok(())
