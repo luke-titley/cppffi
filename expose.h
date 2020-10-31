@@ -17,7 +17,7 @@ class ffi_expose Test {
 
 // Instantiate templates
 //template class Imath::Vec2<float> ffi_expose;
-template class ffi_auto Imath::Vec2<float>;
+template class ffi_auto Vec2<float>;
 //template class ffi_expose Imath::Vec2<double>;
 
 // Expose them with typedefs 
