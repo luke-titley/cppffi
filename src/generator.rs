@@ -10,8 +10,6 @@ use serde_json::json;
 
 //------------------------------------------------------------------------------
 static HEADER_BEGIN: &'static str = "
-#include \"{{{header}}}\"
-
 #define FFI_SIZE(SIZE) char data[(SIZE)];
 #define FFI_ALIGN(ALIGN) __attribute__((aligned((ALIGN))))
 
@@ -25,6 +23,8 @@ static HEADER_END: &'static str = "
 
 //------------------------------------------------------------------------------
 static SOURCE_TEMPLATE: &'static str = "
+#include \"{{{header}}}\"
+
 template<typename CPP>
 static inline CPP & ffi_cast(void * var)
 {
@@ -47,10 +47,11 @@ pub fn run(
     let index = clang::Index::new(&clang, true, true);
 
     state.write_header(HEADER_BEGIN, &json!({
-        "header" : out_header
     }));
 
-    state.write_source(SOURCE_TEMPLATE, &json!({}));
+    state.write_source(SOURCE_TEMPLATE, &json!({
+        "header" : out_header
+    }));
 
     // Parse each header file we have been given
     for header in in_headers.iter() {
