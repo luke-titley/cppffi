@@ -17,9 +17,9 @@ static HEADER_TEMPLATE: &'static str = "
 //------------------------------------------------------------------------------
 static SOURCE_TEMPLATE: &'static str = "
 template<typename CPP>
-static inline CPP & cast(void * var)
+static inline CPP & ffi_cast(void * var)
 {
-    return *((CPP*)var);
+    return *reinterpret_cast<CPP*>(var);
 }
 ";
 
