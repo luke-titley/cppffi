@@ -22,7 +22,7 @@ static HEADER_END: &'static str = "
 ";
 
 //------------------------------------------------------------------------------
-static SOURCE_TEMPLATE: &'static str = "
+static SOURCE_BEGIN: &'static str = "
 #include \"{{{header}}}\"
 {{#each headers}}
 #include \"{{this}}\"
@@ -38,6 +38,13 @@ template<typename CPP>
 static inline const CPP & ffi_cast(const void * var)
 {
     return *reinterpret_cast<const CPP*>(var);
+}
+
+extern \"C\" {
+";
+
+//------------------------------------------------------------------------------
+static SOURCE_END: &'static str = "
 }
 ";
 
@@ -57,8 +64,8 @@ pub fn run(
 
     state.write_header(HEADER_BEGIN, &json!({}));
 
-    state.write_source(SOURCE_TEMPLATE, &json!({ "header": out_header,
-                                                 "headers" : in_headers }));
+    state.write_source(SOURCE_BEGIN, &json!({ "header": out_header,
+                                               "headers" : in_headers }));
 
     // Parse each header file we have been given
     for header in in_headers.iter() {
@@ -83,6 +90,8 @@ pub fn run(
 
         state.write_header(HEADER_END, &json!({}));
     }
+
+    state.write_source(SOURCE_END, &json!({}));
 
     Ok(())
 }

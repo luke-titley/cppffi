@@ -14,7 +14,7 @@ use serde_json::json;
 //------------------------------------------------------------------------------
 static HEADER_TEMPLATE: &'static str = "
 {{field_type}} * {{class}}_mut_{{{field_name}}}({{class}} * self);
-const {{field_type}} * {{class}}_get_{{{field_name}}}({{class}} * self);
+const {{field_type}} * {{class}}_get_{{{field_name}}}(const {{class}} * self);
 ";
 
 static BODY_TEMPLATE: &'static str = "
