@@ -2,6 +2,7 @@
 // Copywrite Luke Titley 2020
 //------------------------------------------------------------------------------
 use super::constructor;
+use super::field;
 use super::method;
 use crate::class_info;
 use crate::ffi_expose;
@@ -77,6 +78,13 @@ pub fn handle(state: &mut State, entity: clang::Entity) -> Result<()> {
                         ));
                     }
 
+                    // Fields
+                    clang::EntityKind::FieldDecl => {
+                        to_visit_result(field::handle(
+                            &info, state, child, entity,
+                        ));
+                    }
+
                     // Methods
                     clang::EntityKind::Method => {
                         to_visit_result(method::handle(
@@ -101,6 +109,11 @@ pub fn handle(state: &mut State, entity: clang::Entity) -> Result<()> {
                     to_visit_result(constructor::handle(
                         &info, state, child, entity,
                     ));
+                }
+
+                // Fields
+                clang::EntityKind::FieldDecl => {
+                    to_visit_result(field::handle(&info, state, child, entity));
                 }
 
                 // Methods

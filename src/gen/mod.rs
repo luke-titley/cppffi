@@ -4,5 +4,6 @@
 pub mod class;
 pub mod class_template;
 pub mod constructor;
+pub mod field;
 pub mod method;
 pub mod typedef;
