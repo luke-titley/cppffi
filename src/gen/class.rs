@@ -17,7 +17,7 @@ typedef struct { FFI_SIZE({{size}}) } FFI_ALIGN({{align}}) {{name}};
 ";
 
 //------------------------------------------------------------------------------
-pub fn handle(state: &mut State, entity: clang::Entity) -> Result<()> {
+pub fn handle(ns : &str, state: &mut State, entity: clang::Entity) -> Result<()> {
     if let Some(ffi_arguments) = ffi_expose::get_arguments(state, entity)? {
         let original_name = entity.get_display_name().unwrap();
 
