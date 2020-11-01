@@ -12,17 +12,17 @@ use crate::utils;
 
 //------------------------------------------------------------------------------
 static HEADER_TEMPLATE: &'static str = "
-{{return}} {{class}}__{{{outer_name}}}({{class}} * this{{comma}}{{params}});
+{{return}} {{class}}__{{{outer_name}}}({{class}} * self{{comma}}{{params}});
 ";
 
 static BODY_TEMPLATE: &'static str = "
-{{return}} {{class}}__{{{outer_name}}}({{class}} * this{{comma}}{{params}})
+{{return}} {{class}}__{{{outer_name}}}({{class}} * self{{comma}}{{params}})
 { {{{types}}}
     {{#if is_void}}
-    ffi_cast<{{{class}}} >(this).{{{name}}}({{{args}}});
+    ffi_cast<{{{class}}} >(self).{{{name}}}({{{args}}});
     {{else}}
     return ffi_cast<{{return}}>(&
-        ffi_cast<{{{cpp_class}}} >(this).{{{name}}}({{{args}}}
+        ffi_cast<{{{cpp_class}}} >(self).{{{name}}}({{{args}}}
         )
     );
     {{/if}}

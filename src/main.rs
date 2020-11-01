@@ -15,8 +15,8 @@ mod utils;
 fn main() {
     generator::run(
         &["expose.h"],
-        "out.hpp",
-        "out.cpp",
+        "c_tests/Imath_c.h",
+        "c_tests/Imath_c.cpp",
         &[
         "-x","c++",
          "-isysroot/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",

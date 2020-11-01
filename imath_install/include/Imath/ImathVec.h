@@ -71,8 +71,8 @@ template <class T> class Vec2
     // Access to elements
     //-------------------
 
-    T x ffi_auto;
-    T y ffi_auto;
+    T x;
+    T y;
 
     IMATH_HOSTDEVICE IMATH_CONSTEXPR14 T& operator[] (int i);
     IMATH_HOSTDEVICE constexpr const T& operator[] (int i) const;
@@ -81,9 +81,9 @@ template <class T> class Vec2
     // Constructors
     //-------------
 
-    IMATH_HOSTDEVICE Vec2();                     // no initialization
+    IMATH_HOSTDEVICE Vec2() ffi_auto;                     // no initialization
     IMATH_HOSTDEVICE IMATH_CONSTEXPR14 explicit Vec2 (T a);         // (a a)
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Vec2 (T a, T b) ffi(new_xy); // (a b)
+    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Vec2 (T a, T b); // (a b)
 
     //---------------------------------
     // Copy constructors and assignment
@@ -112,7 +112,7 @@ template <class T> class Vec2
 
     template <class S> IMATH_HOSTDEVICE void getValue (Vec2<S>& v) const;
 
-    IMATH_HOSTDEVICE T* getValue() ffi(mut_value);
+    IMATH_HOSTDEVICE T* getValue();
     IMATH_HOSTDEVICE const T* getValue() const;
 
     //---------
@@ -156,7 +156,7 @@ template <class T> class Vec2
     // Vec3 (this->x, this->y, 0) % Vec3 (v.x, v.y, 0)
     //------------------------------------------------
 
-    IMATH_HOSTDEVICE constexpr T cross (const Vec2& v) const ffi_auto;
+    IMATH_HOSTDEVICE constexpr T cross (const Vec2& v) const;
     IMATH_HOSTDEVICE constexpr T operator% (const Vec2& v) const;
 
     //------------------------

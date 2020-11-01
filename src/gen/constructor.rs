@@ -11,16 +11,16 @@ use serde_json::json;
 
 //------------------------------------------------------------------------------
 static HEADER_TEMPLATE: &'static str = "
-void {{class}}_{{outer_method}}({{class}} * this{{comma}}{{params}});
+void {{class}}_{{outer_method}}({{class}} * self{{comma}}{{params}});
 ";
 
 static BODY_TEMPLATE: &'static str = "
 static_assert(sizeof({{class}}) == sizeof({{{cpp_class}}}));
 static_assert(alignof({{class}}) == alignof({{{cpp_class}}}));
 
-void {{class}}_{{outer_method}}({{class}} * this{{comma}}{{params}})
+void {{class}}_{{outer_method}}({{class}} * self{{comma}}{{params}})
 { {{{types}}}
-    new (this) {{{cpp_class}}}({{{args}}});
+    new (self) {{{cpp_class}}}({{{args}}});
 }
 ";
 

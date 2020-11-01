@@ -9,6 +9,16 @@ use super::utils::to_visit_result;
 use serde_json::json;
 
 //------------------------------------------------------------------------------
+static HEADER_BEGIN: &'static str = "
+extern \"C\" {
+";
+
+//------------------------------------------------------------------------------
+static HEADER_END: &'static str = "
+}
+";
+
+//------------------------------------------------------------------------------
 static HEADER_TEMPLATE: &'static str = "
 #define FFI_SIZE(SIZE) char data[(SIZE)];
 #define FFI_ALIGN(ALIGN) __attribute__((aligned((ALIGN))))
@@ -37,6 +47,7 @@ pub fn run(
     let clang = clang::Clang::new()?;
     let index = clang::Index::new(&clang, true, true);
 
+    state.write_header(HEADER_BEGIN, &json!({}));
     state.write_header(HEADER_TEMPLATE, &json!({}));
 
     state.write_source(SOURCE_TEMPLATE, &json!({}));
@@ -74,6 +85,8 @@ pub fn run(
             };
             clang::EntityVisitResult::Recurse
         });
+
+        state.write_header(HEADER_END, &json!({}));
     }
 
     Ok(())
