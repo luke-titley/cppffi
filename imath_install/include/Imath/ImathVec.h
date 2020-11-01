@@ -71,7 +71,8 @@ template <class T> class Vec2
     // Access to elements
     //-------------------
 
-    T x, y;
+    T x ffi_auto;
+    T y ffi_auto;
 
     IMATH_HOSTDEVICE IMATH_CONSTEXPR14 T& operator[] (int i);
     IMATH_HOSTDEVICE constexpr const T& operator[] (int i) const;
