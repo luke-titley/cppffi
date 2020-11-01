@@ -13,23 +13,21 @@ use serde_json::json;
 
 //------------------------------------------------------------------------------
 static HEADER_TEMPLATE: &'static str = "
-{{field_type}} * {{class}}_mut_{{{field_name}}}({{class}} * this);
-const {{field_type}} * {{class}}_get_{{{field_name}}}({{class}} * this);
+{{field_type}} * {{class}}_mut_{{{field_name}}}({{class}} * self);
+const {{field_type}} * {{class}}_get_{{{field_name}}}({{class}} * self);
 ";
 
 static BODY_TEMPLATE: &'static str = "
-{{field_type}} * {{class}}_mut_{{{field_name}}}({{class}} * this)
+{{field_type}} * {{class}}_mut_{{{field_name}}}({{class}} * self)
 {
     return & ffi_cast<{{field_type}}>(&
-        ffi_cast<{{{cpp_class}}} >(this).{{{field_name}}}
-        )
+        ffi_cast<{{{cpp_class}}} >(self).{{{field_name}}}
     );
 }
-const {{field_type}} * {{class}}_get_{{{field_name}}}(const {{class}} * this)
+const {{field_type}} * {{class}}_get_{{{field_name}}}(const {{class}} * self)
 {
     return & ffi_cast<{{field_type}}>(&
-        ffi_cast<{{{cpp_class}}} >(this).{{{field_name}}}
-        )
+        ffi_cast<{{{cpp_class}}} >(self).{{{field_name}}}
     );
 }
 ";
@@ -45,7 +43,7 @@ pub fn handle(
         if let Some(field_type) =
             convert_to_c_type(info, state, &entity.get_type().unwrap())
         {
-            let cpp_class_name = parent.get_display_name().unwrap();
+            let cpp_class_name = &info.cpp_name;
             let class_name = info.c_name.clone();
             let field_name = entity.get_display_name().unwrap();
 

@@ -33,6 +33,12 @@ static inline CPP & ffi_cast(void * var)
 {
     return *reinterpret_cast<CPP*>(var);
 }
+
+template<typename CPP>
+static inline const CPP & ffi_cast(const void * var)
+{
+    return *reinterpret_cast<const CPP*>(var);
+}
 ";
 
 pub fn run(

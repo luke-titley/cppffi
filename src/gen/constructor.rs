@@ -15,8 +15,8 @@ void {{class}}_{{outer_method}}({{class}} * self{{comma}}{{params}});
 ";
 
 static BODY_TEMPLATE: &'static str = "
-static_assert(sizeof({{class}}) == sizeof({{{cpp_class}}}));
-static_assert(alignof({{class}}) == alignof({{{cpp_class}}}));
+static_assert(sizeof({{class}}) == sizeof({{{cpp_class}}}), \"Miss matching size for {{{cpp_class}}}\");
+static_assert(alignof({{class}}) == alignof({{{cpp_class}}}), \"Miss matching alignment for {{{cpp_class}}}\");
 
 void {{class}}_{{outer_method}}({{class}} * self{{comma}}{{params}})
 { {{{types}}}
