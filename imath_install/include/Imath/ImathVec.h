@@ -82,7 +82,7 @@ template <class T> class Vec2
     //-------------
 
     IMATH_HOSTDEVICE Vec2() ffi_auto;                     // no initialization
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 explicit Vec2 (T a);         // (a a)
+    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 explicit Vec2 (T a); // (a a)
     IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Vec2 (T a, T b); // (a b)
 
     //---------------------------------
