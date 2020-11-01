@@ -6,6 +6,16 @@ use super::result::Result;
 use super::state;
 use super::supported_types;
 use super::utils::to_visit_result;
+use serde_json::json;
+
+//------------------------------------------------------------------------------
+static HEADER_TEMPLATE: &'static str = "
+template<typename CPP>
+inline CPP & cast(void * var)
+{
+    return *((CPP*)var);
+}
+";
 
 pub fn run(
     in_headers: &[&str],
@@ -20,6 +30,11 @@ pub fn run(
     // Start parsing header files
     let clang = clang::Clang::new()?;
     let index = clang::Index::new(&clang, true, true);
+
+    state.write_header(
+        HEADER_TEMPLATE,
+        &json!({}),
+    );
 
     // Parse each header file we have been given
     for header in in_headers.iter() {

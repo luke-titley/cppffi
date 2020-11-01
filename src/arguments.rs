@@ -107,7 +107,8 @@ pub fn build_arguments(
         .map(|(index, arg)| {
             let name = arg.get_name().unwrap();
 
-            format!("*((ARG_{index}*)&{name})", index = index, name = name)
+            //format!("\n            *((ARG_{index}*)&{name})", index = index, name = name)
+            format!("\n            cast<ARG_{index}>(&{name})", index = index, name = name)
         })
         .collect::<std::vec::Vec<std::string::String>>()
         .join(",");

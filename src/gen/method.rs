@@ -19,10 +19,13 @@ static BODY_TEMPLATE: &'static str = "
 {{return}} {{class}}__{{{outer_name}}} ({{class}} * this {{comma}} {{params}})
 { {{{types}}}
     {{#if is_void}}
-    return ({{{class}}}*)(this)->{{{name}}}({{{args}}});
+    return cast<{{{class}}} >(this).{{{name}}}({{{args}}});
     {{else}}
-    {{return}} ffi_result = (({{{cpp_class}}}*)this)->{{{name}}}({{{args}}}));
-    return *((({{return}})*)&ffi_result);
+    {{return}} ffi_result =
+        cast<{{{cpp_class}}} >(this).{{{name}}}({{{args}}}
+        )
+    );
+    return cast<{{return}})>(&ffi_result);
     {{/if}}
 }
 ";
