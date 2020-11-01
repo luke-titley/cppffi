@@ -64,8 +64,11 @@ pub fn run(
 
     state.write_header(HEADER_BEGIN, &json!({}));
 
-    state.write_source(SOURCE_BEGIN, &json!({ "header": out_header,
-                                               "headers" : in_headers }));
+    state.write_source(
+        SOURCE_BEGIN,
+        &json!({ "header": out_header,
+                                               "headers" : in_headers }),
+    );
 
     // Parse each header file we have been given
     for header in in_headers.iter() {

@@ -82,14 +82,14 @@ template <class T> class Vec2
     //-------------
 
     IMATH_HOSTDEVICE Vec2() ffi_auto;                     // no initialization
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 explicit Vec2 (T a); // (a a)
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Vec2 (T a, T b); // (a b)
+    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 explicit Vec2 (T a) ffi(new_from_scalar); // (a a)
+    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Vec2 (T a, T b) ffi(new_from_xy); // (a b)
 
     //---------------------------------
     // Copy constructors and assignment
     //---------------------------------
 
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Vec2 (const Vec2& v);
+    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Vec2 (const Vec2& v) ffi(copy);
     template <class S> IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Vec2 (const Vec2<S>& v);
 
     IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Vec2& operator= (const Vec2& v);

@@ -44,6 +44,7 @@ impl ClassInfo {
 
 //------------------------------------------------------------------------------
 pub fn build_template_parameter_mapping(
+    ns: &str,
     template: clang::Entity,
     template_instance: clang::Entity,
 ) -> TemplateParameters {
@@ -63,7 +64,11 @@ pub fn build_template_parameter_mapping(
 
     // Zip the result
     let mut result = TemplateParameters::new();
-    result.insert(raw_def_name.to_string(), raw_name.to_string());
+    result.insert(
+        raw_def_name.to_string(),
+        format!("::{}::{}", ns, raw_name.to_string()),
+        //raw_name.to_string(),
+    );
     for (key, value) in param_names.zip(param_values) {
         result.insert(key[1].to_string(), value[1].to_string());
     }

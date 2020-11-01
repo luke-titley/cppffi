@@ -67,14 +67,7 @@ pub fn build_arguments(
         .enumerate()
         .map(|(index, arg)| {
             let type_ =
-                convert_to_c_type(info, state, &arg.get_type().unwrap())
-                    .expect(&format!(
-                        "Exposing a method that has parameter types that
-          are not tagged to be exposed {}{}, see {}",
-                        class_name,
-                        method_name,
-                        arg.get_type().unwrap().get_display_name(),
-                    ));
+                expand_template_parameters(info, &arg.get_type().unwrap());
             format!("\n    using ARG_{} = {};", index, type_)
         })
         .collect::<std::vec::Vec<std::string::String>>()

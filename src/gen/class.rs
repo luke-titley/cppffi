@@ -16,6 +16,13 @@ static HEADER_TEMPLATE: &'static str = "
 typedef struct { FFI_SIZE({{size}}) } FFI_ALIGN({{align}}) {{name}};
 ";
 
+static BODY_TEMPLATE: &'static str = "
+static_assert(sizeof({{class}}) == sizeof({{{cpp_class}}}),
+             \"Mismatching size for {{{cpp_class}}}\");
+static_assert(alignof({{class}}) == alignof({{{cpp_class}}}),
+             \"Mismatching alignment for {{{cpp_class}}}\");
+";
+
 //------------------------------------------------------------------------------
 pub fn handle(
     ns: &str,
@@ -48,10 +55,22 @@ pub fn handle(
                     "align" : align}),
         );
 
+        state.write_source(
+            BODY_TEMPLATE,
+            &json!({"class" : name,
+                    "cpp_class" : original_name,
+                    "size" : size,
+                    "align" : align}),
+        );
+
         // Add the class to the list of supported types subsequent methods
         // will be able to refer to it
         state.supported_types.insert(
-            entity.get_display_name().unwrap().to_string(),
+            format!(
+                "::{}::{}",
+                ns,
+                entity.get_display_name().unwrap().to_string()
+            ),
             name.to_string(),
         );
 
@@ -64,7 +83,7 @@ pub fn handle(
             let info = class_info::ClassInfo {
                 template_parameters:
                     class_info::build_template_parameter_mapping(
-                        definition, entity,
+                        ns, definition, entity,
                     ),
                 c_name: name.clone(),
                 namespace: ns.to_string(),
