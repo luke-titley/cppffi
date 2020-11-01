@@ -10,8 +10,14 @@ use serde_json::json;
 
 //------------------------------------------------------------------------------
 static HEADER_TEMPLATE: &'static str = "
+#define FFI_SIZE(SIZE) char data[(SIZE)];
+#define FFI_ALIGN(ALIGN) __attribute__((aligned((ALIGN))))
+";
+
+//------------------------------------------------------------------------------
+static SOURCE_TEMPLATE: &'static str = "
 template<typename CPP>
-inline CPP & cast(void * var)
+static inline CPP & cast(void * var)
 {
     return *((CPP*)var);
 }
@@ -33,6 +39,11 @@ pub fn run(
 
     state.write_header(
         HEADER_TEMPLATE,
+        &json!({}),
+    );
+
+    state.write_source(
+        SOURCE_TEMPLATE,
         &json!({}),
     );
 

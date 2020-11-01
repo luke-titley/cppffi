@@ -12,10 +12,7 @@ use serde_json::json;
 
 //------------------------------------------------------------------------------
 static HEADER_TEMPLATE: &'static str = "
-typedef struct
-{
-    char m_impl[{{size}}];
-} __attribute__((aligned({{align}}))) {{name}};
+typedef struct { FFI_SIZE({{size}}) } FFI_ALIGN({{align}}) {{name}};
 ";
 
 //------------------------------------------------------------------------------

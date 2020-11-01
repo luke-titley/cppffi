@@ -113,7 +113,7 @@ pub fn build_arguments(
         .collect::<std::vec::Vec<std::string::String>>()
         .join(",");
 
-    let comma = if params.is_empty() { "" } else { "," };
+    let comma = if params.is_empty() { "" } else { ", " };
 
     (types, params, args, comma)
 }

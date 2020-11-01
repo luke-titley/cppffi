@@ -12,11 +12,11 @@ use crate::utils;
 
 //------------------------------------------------------------------------------
 static HEADER_TEMPLATE: &'static str = "
-{{return}} {{class}}__{{{outer_name}}} ({{class}} * this {{comma}} {{params}});
+{{return}} {{class}}__{{{outer_name}}} ({{class}} * this{{comma}}{{params}});
 ";
 
 static BODY_TEMPLATE: &'static str = "
-{{return}} {{class}}__{{{outer_name}}} ({{class}} * this {{comma}} {{params}})
+{{return}} {{class}}__{{{outer_name}}} ({{class}} * this{{comma}}{{params}})
 { {{{types}}}
     {{#if is_void}}
     return cast<{{{class}}} >(this).{{{name}}}({{{args}}});
@@ -25,7 +25,7 @@ static BODY_TEMPLATE: &'static str = "
         cast<{{{cpp_class}}} >(this).{{{name}}}({{{args}}}
         )
     );
-    return cast<{{return}})>(&ffi_result);
+    return cast<{{return}}>(&ffi_result);
     {{/if}}
 }
 ";
