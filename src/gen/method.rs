@@ -34,7 +34,6 @@ pub fn handle(
     info: &class_info::ClassInfo,
     state: &mut State,
     entity: clang::Entity,
-    parent: clang::Entity,
 ) -> Result<()> {
     if let Some(ffi_arguments) =
         ffi_expose::get_arguments(state, entity).unwrap()
@@ -42,7 +41,7 @@ pub fn handle(
         if let Some(result_type) =
             convert_to_c_type(info, state, &entity.get_result_type().unwrap())
         {
-            let cpp_class_name = parent.get_display_name().unwrap();
+            let cpp_class_name = &info.cpp_name;
             let class_name = info.c_name.clone();
 
             let method_name = entity.get_name().unwrap();

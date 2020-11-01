@@ -2,8 +2,8 @@
 
 int main()
 {
-    Vec2f a;
-    Vec2f_new(&a);
+    Imath_3_0__Vec2f a;
+    Imath_3_0__Vec2f_new(&a);
 
     return 0;
 }

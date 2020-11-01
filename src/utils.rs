@@ -5,7 +5,7 @@ use super::result::Result;
 
 //------------------------------------------------------------------------------
 pub fn sanitize(name: &std::string::String) -> std::string::String {
-    name.replace("<", "_").replace(">", "_")
+    name.replace("<", "_").replace(">", "_").replace(":", "_")
 }
 
 //------------------------------------------------------------------------------

@@ -8,13 +8,17 @@ type TemplateParameters =
 pub struct ClassInfo {
     pub template_parameters: TemplateParameters,
     pub c_name: std::string::String,
+    pub cpp_name: std::string::String,
+    pub namespace: std::string::String,
 }
 
 impl ClassInfo {
-    pub fn new(name: &str) -> Self {
+    pub fn new(namespace: &str, name: &str, cpp_name: &str) -> Self {
         Self {
             template_parameters: TemplateParameters::new(),
             c_name: name.to_string(),
+            cpp_name: cpp_name.to_string(),
+            namespace: namespace.to_string(),
         }
     }
 }

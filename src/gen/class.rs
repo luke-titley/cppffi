@@ -17,20 +17,28 @@ typedef struct { FFI_SIZE({{size}}) } FFI_ALIGN({{align}}) {{name}};
 ";
 
 //------------------------------------------------------------------------------
-pub fn handle(ns : &str, state: &mut State, entity: clang::Entity) -> Result<()> {
+pub fn handle(
+    ns: &str,
+    state: &mut State,
+    entity: clang::Entity,
+) -> Result<()> {
     if let Some(ffi_arguments) = ffi_expose::get_arguments(state, entity)? {
-        let original_name = entity.get_display_name().unwrap();
+        let cpp_name = entity.get_display_name().unwrap();
 
-        let name = sanitize(if ffi_arguments.arguments.is_empty() {
-            &original_name
-        } else {
-            &ffi_arguments.arguments[0]
-        });
+        let name = &format!(
+            "{}__{}",
+            ns,
+            sanitize(if ffi_arguments.arguments.is_empty() {
+                &cpp_name
+            } else {
+                &ffi_arguments.arguments[0]
+            })
+        );
+
+        let original_name = format!("{}::{}", ns, cpp_name);
 
         let size = entity.get_type().unwrap().get_sizeof().unwrap();
         let align = entity.get_type().unwrap().get_alignof().unwrap();
-
-        //println!("name {} {}", name, entity.has_attributes());
 
         // Generate the code for the class
         state.write_header(
@@ -59,6 +67,8 @@ pub fn handle(ns : &str, state: &mut State, entity: clang::Entity) -> Result<()>
                         definition, entity,
                     ),
                 c_name: name.clone(),
+                namespace: ns.to_string(),
+                cpp_name: original_name.clone(),
             };
 
             //println!("{:?}", &info.template_parameters);
@@ -74,7 +84,7 @@ pub fn handle(ns : &str, state: &mut State, entity: clang::Entity) -> Result<()>
                     // Constructor
                     clang::EntityKind::Constructor => {
                         to_visit_result(constructor::handle(
-                            &info, state, child, entity,
+                            &info, state, child,
                         ));
                     }
 
@@ -87,9 +97,7 @@ pub fn handle(ns : &str, state: &mut State, entity: clang::Entity) -> Result<()>
 
                     // Methods
                     clang::EntityKind::Method => {
-                        to_visit_result(method::handle(
-                            &info, state, child, entity,
-                        ));
+                        to_visit_result(method::handle(&info, state, child));
                     }
 
                     // Ignore everything else
@@ -101,14 +109,12 @@ pub fn handle(ns : &str, state: &mut State, entity: clang::Entity) -> Result<()>
 
         // Generate the methods of the class
         entity.visit_children(|child, _| {
-            let info = class_info::ClassInfo::new(&name);
+            let info = class_info::ClassInfo::new(&name, ns, &original_name);
 
             match child.get_kind() {
                 // Constructor
                 clang::EntityKind::Constructor => {
-                    to_visit_result(constructor::handle(
-                        &info, state, child, entity,
-                    ));
+                    to_visit_result(constructor::handle(&info, state, child));
                 }
 
                 // Fields
@@ -118,9 +124,7 @@ pub fn handle(ns : &str, state: &mut State, entity: clang::Entity) -> Result<()>
 
                 // Methods
                 clang::EntityKind::Method => {
-                    to_visit_result(method::handle(
-                        &info, state, child, entity,
-                    ));
+                    to_visit_result(method::handle(&info, state, child));
                 }
 
                 // Ignore everything else

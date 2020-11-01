@@ -24,6 +24,9 @@ static HEADER_END: &'static str = "
 //------------------------------------------------------------------------------
 static SOURCE_TEMPLATE: &'static str = "
 #include \"{{{header}}}\"
+{{#each headers}}
+#include \"{{this}}\"
+{{/each}}
 
 template<typename CPP>
 static inline CPP & ffi_cast(void * var)
@@ -46,12 +49,10 @@ pub fn run(
     let clang = clang::Clang::new()?;
     let index = clang::Index::new(&clang, true, true);
 
-    state.write_header(HEADER_BEGIN, &json!({
-    }));
+    state.write_header(HEADER_BEGIN, &json!({}));
 
-    state.write_source(SOURCE_TEMPLATE, &json!({
-        "header" : out_header
-    }));
+    state.write_source(SOURCE_TEMPLATE, &json!({ "header": out_header,
+                                                 "headers" : in_headers }));
 
     // Parse each header file we have been given
     for header in in_headers.iter() {
@@ -69,8 +70,7 @@ pub fn run(
                 }
 
                 // Ignore everything else
-                _ => {
-                }
+                _ => {}
             };
             clang::EntityVisitResult::Recurse
         });

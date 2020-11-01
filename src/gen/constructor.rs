@@ -29,10 +29,9 @@ pub fn handle(
     info: &class_info::ClassInfo,
     state: &mut State,
     entity: clang::Entity,
-    parent: clang::Entity,
 ) -> Result<()> {
     if let Some(ffi_arguments) = ffi_expose::get_arguments(state, entity)? {
-        let cpp_parent_name = parent.get_display_name().unwrap();
+        let cpp_parent_name = &info.cpp_name;
         let parent_name = info.c_name.clone();
 
         let outer_method_name = if ffi_arguments.arguments.is_empty()
