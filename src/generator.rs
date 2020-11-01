@@ -37,15 +37,9 @@ pub fn run(
     let clang = clang::Clang::new()?;
     let index = clang::Index::new(&clang, true, true);
 
-    state.write_header(
-        HEADER_TEMPLATE,
-        &json!({}),
-    );
+    state.write_header(HEADER_TEMPLATE, &json!({}));
 
-    state.write_source(
-        SOURCE_TEMPLATE,
-        &json!({}),
-    );
+    state.write_source(SOURCE_TEMPLATE, &json!({}));
 
     // Parse each header file we have been given
     for header in in_headers.iter() {

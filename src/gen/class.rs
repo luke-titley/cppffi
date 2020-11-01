@@ -57,7 +57,7 @@ pub fn handle(state: &mut State, entity: clang::Entity) -> Result<()> {
                     class_info::build_template_parameter_mapping(
                         definition, entity,
                     ),
-                    c_name : name.clone(),
+                c_name: name.clone(),
             };
 
             //println!("{:?}", &info.template_parameters);

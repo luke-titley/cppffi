@@ -11,10 +11,10 @@ pub struct ClassInfo {
 }
 
 impl ClassInfo {
-    pub fn new(name : &str) -> Self {
+    pub fn new(name: &str) -> Self {
         Self {
             template_parameters: TemplateParameters::new(),
-            c_name : name.to_string(),
+            c_name: name.to_string(),
         }
     }
 }
