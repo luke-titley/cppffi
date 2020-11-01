@@ -89,7 +89,7 @@ template <class T> class Vec2
     // Copy constructors and assignment
     //---------------------------------
 
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Vec2 (const Vec2& v) ffi(copy);
+    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Vec2 (const Vec2& v);
     template <class S> IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Vec2 (const Vec2<S>& v);
 
     IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Vec2& operator= (const Vec2& v);
@@ -185,7 +185,7 @@ template <class T> class Vec2
     //------------------------------
 
     IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Vec2& operator*= (const Vec2& v);
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Vec2& operator*= (T a);
+    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Vec2& operator*= (T a) ffi(mul);
     IMATH_HOSTDEVICE constexpr Vec2 operator* (const Vec2& v) const;
     IMATH_HOSTDEVICE constexpr Vec2 operator* (T a) const;
 
