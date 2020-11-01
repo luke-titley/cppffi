@@ -12,11 +12,11 @@ use crate::utils;
 
 //------------------------------------------------------------------------------
 static HEADER_TEMPLATE: &'static str = "
-{{return}} {{class}}__{{{outer_name}}} ({{class}} * this{{comma}}{{params}});
+{{return}} {{class}}__{{{outer_name}}}({{class}} * this{{comma}}{{params}});
 ";
 
 static BODY_TEMPLATE: &'static str = "
-{{return}} {{class}}__{{{outer_name}}} ({{class}} * this{{comma}}{{params}})
+{{return}} {{class}}__{{{outer_name}}}({{class}} * this{{comma}}{{params}})
 { {{{types}}}
     {{#if is_void}}
     return ffi_cast<{{{class}}} >(this).{{{name}}}({{{args}}});
