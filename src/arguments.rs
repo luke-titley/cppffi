@@ -103,7 +103,7 @@ pub fn build_arguments(
 
             //format!("\n            *((ARG_{index}*)&{name})", index = index, name = name)
             format!(
-                "\n            ffi_cast<ARG_{index}>(&{name})",
+                "\n            ffi_cast<ARG_{index}>({name})",
                 index = index,
                 name = name
             )

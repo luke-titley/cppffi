@@ -29,15 +29,15 @@ static SOURCE_BEGIN: &'static str = "
 {{/each}}
 
 template<typename CPP, typename C>
-static inline CPP & ffi_cast(C * var)
+static inline CPP & ffi_cast(C & var)
 {
-    return *reinterpret_cast<CPP*>(var);
+    return reinterpret_cast<CPP&>(var);
 }
 
 template<typename CPP, typename C>
-static inline const CPP & ffi_cast(const C * var)
+static inline const CPP & ffi_cast(const C & var)
 {
-    return *reinterpret_cast<const CPP*>(var);
+    return reinterpret_cast<const CPP&>(var);
 }
 
 extern \"C\" {

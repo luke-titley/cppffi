@@ -20,14 +20,14 @@ const {{field_type}} * {{class}}_get_{{{field_name}}}(const {{class}} * self);
 static BODY_TEMPLATE: &'static str = "
 {{field_type}} * {{class}}_mut_{{{field_name}}}({{class}} * self)
 {
-    return & ffi_cast<{{field_type}}>(&
-        ffi_cast<{{{cpp_class}}} >(self).{{{field_name}}}
+    return & ffi_cast<{{field_type}}>(
+        ffi_cast<{{{cpp_class}}} >(*self).{{{field_name}}}
     );
 }
 const {{field_type}} * {{class}}_get_{{{field_name}}}(const {{class}} * self)
 {
-    return & ffi_cast<{{field_type}}>(&
-        ffi_cast<{{{cpp_class}}} >(self).{{{field_name}}}
+    return & ffi_cast<{{field_type}}>(
+        ffi_cast<{{{cpp_class}}} >(*self).{{{field_name}}}
     );
 }
 ";

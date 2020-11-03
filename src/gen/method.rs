@@ -19,10 +19,10 @@ static BODY_TEMPLATE: &'static str = "
 {{{return}}} {{class}}__{{{outer_name}}}({{class}} * self{{comma}}{{params}})
 { {{{types}}}
     {{#if is_void}}
-    ffi_cast<{{{class}}} >(self).{{{name}}}({{{args}}});
+    ffi_cast<{{{class}}} >(*self).{{{name}}}({{{args}}});
     {{else}}
-    return ffi_cast<{{{return}}}>(&
-        ffi_cast<{{{cpp_class}}} >(self).{{{name}}}({{{args}}}
+    return ffi_cast<{{{return}}}>(
+            ffi_cast<{{{cpp_class}}} >(*self).{{{name}}}({{{args}}}
         )
     );
     {{/if}}
