@@ -89,7 +89,7 @@ template <class T> class Vec2
     // Copy constructors and assignment
     //---------------------------------
 
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Vec2 (const Vec2& v);
+    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Vec2 (const Vec2& v) ffi(copy);
     template <class S> IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Vec2 (const Vec2<S>& v);
 
     IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Vec2& operator= (const Vec2& v);

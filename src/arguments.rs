@@ -32,7 +32,8 @@ pub fn convert_to_c_type<'a>(
     let mut remapped_result = std::vec::Vec::new();
     for r in info.remap_template_parameters(&result[..]).iter() {
         match r.as_str() {
-            "*" | "&" | "const" => remapped_result.push(r.clone()),
+            "&" => remapped_result.push("*".to_string()),
+            "*" | "const" => remapped_result.push(r.clone()),
             r => {
                 if let Some(r_) = state.supported_types.get(r) {
                     remapped_result.push(r_.clone());

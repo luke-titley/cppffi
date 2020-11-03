@@ -28,14 +28,14 @@ static SOURCE_BEGIN: &'static str = "
 #include \"{{this}}\"
 {{/each}}
 
-template<typename CPP>
-static inline CPP & ffi_cast(void * var)
+template<typename CPP, typename C>
+static inline CPP & ffi_cast(C * var)
 {
     return *reinterpret_cast<CPP*>(var);
 }
 
-template<typename CPP>
-static inline const CPP & ffi_cast(const void * var)
+template<typename CPP, typename C>
+static inline const CPP & ffi_cast(const C * var)
 {
     return *reinterpret_cast<const CPP*>(var);
 }

@@ -13,6 +13,13 @@ pub fn decompose_type<'a, 'b>(
     result: &'b mut std::vec::Vec<std::string::String>,
     type_: &'a clang::Type<'a>,
 ) {
+    *result = type_
+        .get_display_name()
+        .split(" ")
+        .map(|i| i.to_string())
+        .collect();
+    /*
+    println!("Decomposing {}", type_.get_display_name());
     if let Some(type_) = type_.get_pointee_type() {
         decompose_type(result, &type_);
         result.push("*".to_string());
@@ -22,6 +29,8 @@ pub fn decompose_type<'a, 'b>(
     } else {
         result.push(type_.get_display_name())
     }
+    println!("/Decomposing {:?}", &result);
+    */
 }
 
 //------------------------------------------------------------------------------
