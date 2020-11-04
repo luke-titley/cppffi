@@ -38,8 +38,6 @@ pub fn convert_to_c_type<'a>(
                 if let Some(r_) = state.supported_types.get(r) {
                     remapped_result.push(r_.clone());
                 } else {
-                    println!("{:?}", state.supported_types);
-                    println!("We're done");
                     return None;
                 }
             }
@@ -69,7 +67,7 @@ pub fn build_arguments(
         .map(|(index, arg)| {
             let type_ =
                 expand_template_parameters(info, &arg.get_type().unwrap());
-            format!("\n    using ARG_{} = {};", index, type_)
+            format!("\n    using A{} = {};", index, type_)
         })
         .collect::<std::vec::Vec<std::string::String>>()
         .join("");
@@ -101,12 +99,21 @@ pub fn build_arguments(
         .map(|(index, arg)| {
             let name = arg.get_name().unwrap();
 
-            //format!("\n            *((ARG_{index}*)&{name})", index = index, name = name)
-            format!(
-                "\n            ffi_cast<ARG_{index}>({name})",
-                index = index,
-                name = name
-            )
+            let type_ = arg.get_type().unwrap();
+            let kind = type_.get_kind();
+            match kind {
+                clang::TypeKind::Int
+                | clang::TypeKind::Float
+                | clang::TypeKind::Bool
+                | clang::TypeKind::Double => {
+                    format!("\n                {name}", name = name)
+                }
+                _ => format!(
+                    "\n                ffi_cast<A{index}>({name})",
+                    index = index,
+                    name = name
+                ),
+            }
         })
         .collect::<std::vec::Vec<std::string::String>>()
         .join(",");

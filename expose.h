@@ -1,7 +1,3 @@
-
-#define xstr(s) str(s)
-#define str(s) #s
-
 #define ffi_auto __attribute__((annotate("ffi_expose")))
 #define ffi(S) __attribute__((annotate("ffi_expose" #S)))
 
@@ -9,6 +5,6 @@
 
 namespace Imath_3_0 {
 
-template class ffi(Vec2f) Vec2<float>;
+template class ffi(V2f) Vec2<float>;
 
 }

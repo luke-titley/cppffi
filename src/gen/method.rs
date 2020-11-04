@@ -18,12 +18,13 @@ static HEADER_TEMPLATE: &'static str = "
 static BODY_TEMPLATE: &'static str = "
 {{{return}}} {{class}}__{{{outer_name}}}({{class}} * self{{comma}}{{params}})
 { {{{types}}}
+    using Self = {{{cpp_class}}};
     {{#if is_void}}
-    ffi_cast<{{{class}}} >(*self).{{{name}}}({{{args}}});
+    ffi_cast<Self>(*self).{{{name}}}({{{args}}});
     {{else}}
-    return ffi_cast<{{{return}}}>(
-            ffi_cast<{{{cpp_class}}} >(*self).{{{name}}}({{{args}}}
-        )
+    return
+        ffi_cast<{{{return}}}>(
+            ffi_cast<Self>(*self).{{{name}}}({{{args}}})
     );
     {{/if}}
 }

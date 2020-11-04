@@ -17,7 +17,8 @@ void {{class}}_{{outer_method}}({{class}} * self{{comma}}{{params}});
 static BODY_TEMPLATE: &'static str = "
 void {{class}}_{{outer_method}}({{class}} * self{{comma}}{{params}})
 { {{{types}}}
-    new (self) {{{cpp_class}}}({{{args}}});
+    using Self = {{{cpp_class}}};
+    new (self) Self({{{args}}});
 }
 ";
 

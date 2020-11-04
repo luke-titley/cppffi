@@ -74,8 +74,8 @@ template <class T> class Vec2
     T x ffi_auto;
     T y ffi_auto;
 
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 T& operator[] (int i);
-    IMATH_HOSTDEVICE constexpr const T& operator[] (int i) const;
+    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 T& operator[] (int i) ffi(get);
+    IMATH_HOSTDEVICE constexpr const T& operator[] (int i) const ffi(mut);
 
     //-------------
     // Constructors
@@ -92,7 +92,7 @@ template <class T> class Vec2
     IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Vec2 (const Vec2& v) ffi(copy);
     template <class S> IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Vec2 (const Vec2<S>& v);
 
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Vec2& operator= (const Vec2& v);
+    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Vec2& operator= (const Vec2& v) ffi(assign);
 
     //------------
     // Destructor
@@ -112,8 +112,8 @@ template <class T> class Vec2
 
     template <class S> IMATH_HOSTDEVICE void getValue (Vec2<S>& v) const;
 
-    IMATH_HOSTDEVICE T* getValue();
-    IMATH_HOSTDEVICE const T* getValue() const;
+    IMATH_HOSTDEVICE T* getValue() ffi_auto;
+    IMATH_HOSTDEVICE const T* getValue() const ffi(mutValue);
 
     //---------
     // Equality
@@ -141,14 +141,14 @@ template <class T> class Vec2
     //      abs (this[i] - v[i]) <= e * abs (this[i])
     //-----------------------------------------------------------------------
 
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 bool equalWithAbsError (const Vec2<T>& v, T e) const;
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 bool equalWithRelError (const Vec2<T>& v, T e) const;
+    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 bool equalWithAbsError (const Vec2<T>& v, T e) const ffi_auto;
+    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 bool equalWithRelError (const Vec2<T>& v, T e) const ffi_auto;
 
     //------------
     // Dot product
     //------------
 
-    IMATH_HOSTDEVICE constexpr T dot (const Vec2& v) const;
+    IMATH_HOSTDEVICE constexpr T dot (const Vec2& v) const ffi_auto;
     IMATH_HOSTDEVICE constexpr T operator^ (const Vec2& v) const;
 
     //------------------------------------------------
@@ -156,47 +156,47 @@ template <class T> class Vec2
     // Vec3 (this->x, this->y, 0) % Vec3 (v.x, v.y, 0)
     //------------------------------------------------
 
-    IMATH_HOSTDEVICE constexpr T cross (const Vec2& v) const;
+    IMATH_HOSTDEVICE constexpr T cross (const Vec2& v) const ffi_auto;
     IMATH_HOSTDEVICE constexpr T operator% (const Vec2& v) const;
 
     //------------------------
     // Component-wise addition
     //------------------------
 
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Vec2& operator+= (const Vec2& v);
-    IMATH_HOSTDEVICE constexpr Vec2 operator+ (const Vec2& v) const;
+    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Vec2& operator+= (const Vec2& v) ffi(iadd);
+    IMATH_HOSTDEVICE constexpr Vec2 operator+ (const Vec2& v) const ffi(add);
 
     //---------------------------
     // Component-wise subtraction
     //---------------------------
 
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Vec2& operator-= (const Vec2& v);
-    IMATH_HOSTDEVICE constexpr Vec2 operator- (const Vec2& v) const;
+    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Vec2& operator-= (const Vec2& v) ffi(isub);
+    IMATH_HOSTDEVICE constexpr Vec2 operator- (const Vec2& v) const ffi(sub);
 
     //------------------------------------
     // Component-wise multiplication by -1
     //------------------------------------
 
     IMATH_HOSTDEVICE constexpr Vec2 operator-() const;
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Vec2& negate();
+    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Vec2& negate() ffi_auto;
 
     //------------------------------
     // Component-wise multiplication
     //------------------------------
 
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Vec2& operator*= (const Vec2& v);
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Vec2& operator*= (T a) ffi(mul);
-    IMATH_HOSTDEVICE constexpr Vec2 operator* (const Vec2& v) const;
-    IMATH_HOSTDEVICE constexpr Vec2 operator* (T a) const;
+    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Vec2& operator*= (const Vec2& v) ffi(imul);
+    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Vec2& operator*= (T a) ffi(imul_scalar);
+    IMATH_HOSTDEVICE constexpr Vec2 operator* (const Vec2& v) const ffi(mul);
+    IMATH_HOSTDEVICE constexpr Vec2 operator* (T a) const ffi(mul_scalar);
 
     //------------------------
     // Component-wise division
     //------------------------
 
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Vec2& operator/= (const Vec2& v);
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Vec2& operator/= (T a);
-    IMATH_HOSTDEVICE constexpr Vec2 operator/ (const Vec2& v) const;
-    IMATH_HOSTDEVICE constexpr Vec2 operator/ (T a) const;
+    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Vec2& operator/= (const Vec2& v) ffi(idiv);
+    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Vec2& operator/= (T a) ffi(idiv_scalar);
+    IMATH_HOSTDEVICE constexpr Vec2 operator/ (const Vec2& v) const ffi(div);
+    IMATH_HOSTDEVICE constexpr Vec2 operator/ (T a) const ffi(div_scalar);
 
     //----------------------------------------------------------------
     // Length and normalization:  If v.length() is 0.0, v.normalize()
@@ -207,16 +207,16 @@ template <class T> class Vec2
     // is 0.0, the result is undefined.
     //----------------------------------------------------------------
 
-    IMATH_HOSTDEVICE T length() const;
-    IMATH_HOSTDEVICE constexpr T length2() const;
+    IMATH_HOSTDEVICE T length() const ffi_auto;
+    IMATH_HOSTDEVICE constexpr T length2() const ffi_auto;
 
-    IMATH_HOSTDEVICE const Vec2& normalize(); // modifies *this
-    IMATH_HOSTDEVICE const Vec2& normalizeExc();
-    IMATH_HOSTDEVICE const Vec2& normalizeNonNull();
+    IMATH_HOSTDEVICE const Vec2& normalize() ffi_auto; // modifies *this
+    IMATH_HOSTDEVICE const Vec2& normalizeExc() ffi_auto;
+    IMATH_HOSTDEVICE const Vec2& normalizeNonNull() ffi_auto;
 
-    IMATH_HOSTDEVICE Vec2<T> normalized() const; // does not modify *this
-    IMATH_HOSTDEVICE Vec2<T> normalizedExc() const;
-    IMATH_HOSTDEVICE Vec2<T> normalizedNonNull() const;
+    IMATH_HOSTDEVICE Vec2<T> normalized() const ffi_auto; // does not modify *this
+    IMATH_HOSTDEVICE Vec2<T> normalizedExc() const ffi_auto;
+    IMATH_HOSTDEVICE Vec2<T> normalizedNonNull() const ffi_auto;
 
     //--------------------------------------------------------
     // Number of dimensions, i.e. number of elements in a Vec2
@@ -252,7 +252,9 @@ template <class T> class Vec3
     // Access to elements
     //-------------------
 
-    T x, y, z;
+    T x ffi_auto;
+    T y ffi_auto;
+    T z ffi_auto;
 
     IMATH_HOSTDEVICE IMATH_CONSTEXPR14 T& operator[] (int i);
     IMATH_HOSTDEVICE constexpr const T& operator[] (int i) const;
