@@ -5,16 +5,17 @@ use super::result::Result;
 use super::state::State;
 
 //------------------------------------------------------------------------------
-pub struct Arguments {
-    pub arguments: std::vec::Vec<std::string::String>,
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+pub struct FFI {
+    pub name : Option<std::string::String>,
 }
 
 //------------------------------------------------------------------------------
 pub fn get_arguments(
     _: &mut State,
     entity: clang::Entity,
-) -> Result<Option<Arguments>> {
-    let mut result: Option<Arguments> = None;
+) -> Result<Option<FFI>> {
+    let mut result: Option<FFI> = None;
 
     if entity.has_attributes() {
         entity.visit_children(|child, _| {
@@ -22,14 +23,10 @@ pub fn get_arguments(
                 clang::EntityKind::AnnotateAttr => {
                     let name = child.get_display_name().unwrap();
 
-                    if name.starts_with("ffi_expose") {
-                        let arguments: std::vec::Vec<std::string::String> =
-                            name[10..]
-                                .split(" ")
-                                .map(|i| i.to_string())
-                                .collect();
+                    println!("name: {}", name);
 
-                        result = Some(Arguments { arguments });
+                    if let Ok(arguments) = ron::de::from_str::<FFI>(&name) {
+                        result = Some(arguments.clone());
                         return clang::EntityVisitResult::Break;
                     }
                 }

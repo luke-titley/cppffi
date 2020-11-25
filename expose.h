@@ -1,10 +1,11 @@
-#define ffi_auto __attribute__((annotate("ffi_expose")))
-#define ffi(S) __attribute__((annotate("ffi_expose" #S)))
+#define ffi(S) __attribute__((annotate("FFI("#S")")))
 
-#include "Imath/ImathVec.h"
+#include "pxr/base/tf/token.h"
 
+/*
 namespace Imath_3_0 {
 
 template class ffi(V2f) Vec2<float>;
 
 }
+*/

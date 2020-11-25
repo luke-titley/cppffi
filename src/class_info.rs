@@ -5,6 +5,7 @@ type TemplateParameters =
     std::collections::HashMap<std::string::String, std::string::String>;
 
 //------------------------------------------------------------------------------
+#[derive(Debug)]
 pub struct ClassInfo {
     pub template_parameters: TemplateParameters,
     pub c_name: std::string::String,

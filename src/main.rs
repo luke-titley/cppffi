@@ -15,13 +15,13 @@ mod utils;
 fn main() {
     generator::run(
         &["expose.h"],
-        "c_tests/Imath_c.h",
-        "c_tests/Imath_c.cpp",
+        "c_tests/usd_c.h",
+        "c_tests/usd_c.cpp",
         &[
-        "-x","c++", "-std=c++11",
+        "-x","c++", "-std=c++14",
          "-isysroot/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
          "-isystem/Library/Developer/CommandLineTools/usr/include/c++/v1/",
          "-isystem/Library/Developer/CommandLineTools/usr/lib/clang/10.0.1/include",
-          "-Iimath_install/include"],
+          "-I/Volumes/src/usd-rs/usd-rs/thirdparty/docs/include"],
     );
 }

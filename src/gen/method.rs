@@ -36,7 +36,7 @@ pub fn handle(
     state: &mut State,
     entity: clang::Entity,
 ) -> Result<()> {
-    if let Some(ffi_arguments) =
+    if let Some(args) =
         ffi_expose::get_arguments(state, entity).unwrap()
     {
         if let Some(result_type) =
@@ -46,12 +46,10 @@ pub fn handle(
             let class_name = info.c_name.clone();
 
             let method_name = entity.get_name().unwrap();
-            let outer_method_name = if ffi_arguments.arguments.is_empty()
-                || ffi_arguments.arguments[0].is_empty()
-            {
+            let outer_method_name = if args.name.is_none() {
                 method_name.clone()
             } else {
-                ffi_arguments.arguments[0].clone()
+                args.name.unwrap().clone()
             };
 
             // Build the parameter list

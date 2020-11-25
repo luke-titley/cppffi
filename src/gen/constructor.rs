@@ -28,16 +28,17 @@ pub fn handle(
     state: &mut State,
     entity: clang::Entity,
 ) -> Result<()> {
-    if let Some(ffi_arguments) = ffi_expose::get_arguments(state, entity)? {
+    if let Some(args) = ffi_expose::get_arguments(state, entity)? {
         let cpp_parent_name = &info.cpp_name;
         let parent_name = info.c_name.clone();
 
-        let outer_method_name = if ffi_arguments.arguments.is_empty()
-            || ffi_arguments.arguments[0].is_empty()
-        {
+        println!("Constructor cpp name is {}", cpp_parent_name);
+        println!("Constructor parent name is {}", parent_name);
+
+        let outer_method_name = if args.name.is_none() {
             "new".to_string()
         } else {
-            ffi_arguments.arguments[0].clone()
+            args.name.unwrap().clone()
         };
 
         // Build the parameter list

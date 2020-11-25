@@ -29,18 +29,20 @@ pub fn handle(
     state: &mut State,
     entity: clang::Entity,
 ) -> Result<()> {
-    if let Some(ffi_arguments) = ffi_expose::get_arguments(state, entity)? {
+    if let Some(args) = ffi_expose::get_arguments(state, entity)? {
         let cpp_name = entity.get_display_name().unwrap();
 
-        let name = &format!(
-            "{}__{}",
-            ns,
-            sanitize(if ffi_arguments.arguments.is_empty() {
-                &cpp_name
-            } else {
-                &ffi_arguments.arguments[0]
-            })
-        );
+        let name = if let Some(name) = args.name {
+            format!(
+                "{}__{}",
+                ns,
+                sanitize(&name))
+        } else {
+            format!(
+                "{}__{}",
+                ns,
+                sanitize(&cpp_name))
+        };
 
         let original_name = format!("{}::{}", ns, cpp_name);
 
@@ -50,14 +52,14 @@ pub fn handle(
         // Generate the code for the class
         state.write_header(
             HEADER_TEMPLATE,
-            &json!({"name" : name,
+            &json!({"name" : &name,
                     "size" : size,
                     "align" : align}),
         );
 
         state.write_source(
             BODY_TEMPLATE,
-            &json!({"class" : name,
+            &json!({"class" : &name,
                     "cpp_class" : original_name,
                     "size" : size,
                     "align" : align}),
@@ -71,7 +73,7 @@ pub fn handle(
                 ns,
                 entity.get_display_name().unwrap().to_string()
             ),
-            name.to_string(),
+            name.clone(),
         );
 
         if let Some(definition) = entity.get_template() {
@@ -128,7 +130,7 @@ pub fn handle(
 
         // Generate the methods of the class
         entity.visit_children(|child, _| {
-            let info = class_info::ClassInfo::new(&name, ns, &original_name);
+            let info = class_info::ClassInfo::new(ns, &name, &original_name);
 
             match child.get_kind() {
                 // Constructor
