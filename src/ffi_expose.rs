@@ -23,8 +23,6 @@ pub fn get_arguments(
                 clang::EntityKind::AnnotateAttr => {
                     let name = child.get_display_name().unwrap();
 
-                    println!("name: {}", name);
-
                     if let Ok(arguments) = ron::de::from_str::<FFI>(&name) {
                         result = Some(arguments.clone());
                         return clang::EntityVisitResult::Break;

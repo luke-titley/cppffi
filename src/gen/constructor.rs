@@ -32,9 +32,6 @@ pub fn handle(
         let cpp_parent_name = &info.cpp_name;
         let parent_name = info.c_name.clone();
 
-        println!("Constructor cpp name is {}", cpp_parent_name);
-        println!("Constructor parent name is {}", parent_name);
-
         let outer_method_name = if args.name.is_none() {
             "new".to_string()
         } else {

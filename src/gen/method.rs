@@ -45,9 +45,11 @@ pub fn handle(
             let cpp_class_name = &info.cpp_name;
             let class_name = info.c_name.clone();
 
+            use heck::SnakeCase as _;
+
             let method_name = entity.get_name().unwrap();
             let outer_method_name = if args.name.is_none() {
-                method_name.clone()
+                method_name.to_snake_case()
             } else {
                 args.name.unwrap().clone()
             };
